@@ -14,3 +14,4 @@
 #define BYTE char
 #define USIZE size_t
 #define ISIZE intptr_t
+#define UPTR uintptr_t
