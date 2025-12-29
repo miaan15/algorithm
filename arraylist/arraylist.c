@@ -8,7 +8,7 @@
             a.capacity = n;                                                                        \
             a.items = malloc(a.capacity * sizeof(*a.items));                                       \
             a.size = n;                                                                            \
-            for (usize i = 0; i < n; i++) {                                                        \
+            for (USIZE i = 0; i < n; i++) {                                                        \
                 a.items[i] = s[i];                                                                 \
             }                                                                                      \
         }                                                                                          \
@@ -48,9 +48,9 @@
 #include <stdio.h>
 
 typedef struct {
-    i32 *items;
-    usize size;
-    usize capacity;
+    I32 *items;
+    USIZE size;
+    USIZE capacity;
 } ArrayListI32;
 
 int main() {
@@ -66,7 +66,7 @@ int main() {
 
     ARRAYLIST_REMOVE_BACK(a);
 
-    for (usize i = 0; i < a.size; i++)
+    for (USIZE i = 0; i < a.size; i++)
         printf("%d\n", a.items[i]);
 }
 #endif
