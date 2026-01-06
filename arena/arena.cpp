@@ -1,4 +1,5 @@
-#include "../define.h"
+#define _SOURCE_FILE
+#include "../define.hpp"
 #include <cstdlib>
 #include <cstring>
 

@@ -1,25 +1,24 @@
 #ifndef ARENA_HPP
 #define ARENA_HPP
 
-#include <cstddef>
-#include <cstdint>
+#include "../define.hpp"
 
 namespace mia {
 
 struct ArenaRegion {
     ArenaRegion *next;
-    size_t count;
-    size_t capacity;
-    uintptr_t buffer[];
+    usize count;
+    usize capacity;
+    uptr buffer[];
 };
 
 struct Arena {
     ArenaRegion *begin, *end;
 };
 
-void *arena_alloc(Arena *arena, size_t size_bytes);
-void *arena_realloc(Arena *arena, const void *old_ptr, size_t old_size_bytes,
-                    size_t new_size_bytes);
+void *arena_alloc(Arena *arena, usize size_bytes);
+void *arena_realloc(Arena *arena, const void *old_ptr, usize old_size_bytes,
+                    usize new_size_bytes);
 void arena_free(Arena *arena);
 void arena_reset(Arena *arena);
 void arena_trim_excessed(Arena *arena);
