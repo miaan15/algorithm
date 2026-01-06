@@ -19,7 +19,7 @@ void arrlist_reserve(ArrList<T> *arrlist, usize new_capacity) {
     cauto old_buffer = arrlist->buffer;
 
     arrlist->capacity = new_capacity;
-    arrlist->buffer = malloc(arrlist->capacity);
+    arrlist->buffer = (T *)malloc(arrlist->capacity);
     memcpy(arrlist->buffer, old_buffer, old_capacity);
     free(old_buffer);
 }
@@ -36,13 +36,13 @@ void _arrlist_capacity_extend_handle(ArrList<T> *arrlist, usize size_increase) {
 }
 
 template <typename T>
-void arrlist_append(ArrList<T> *arrlist, const T *value) {
+void arrlist_append(ArrList<T> *arrlist, const T value) {
     _arrlist_capacity_extend_handle(arrlist, 1);
-    *arrlist->buffer[arrlist->count++] = *value;
+    arrlist->buffer[arrlist->count++] = value;
 }
 
 template <typename T>
-void arrlist_insert(ArrList<T> *arrlist, usize index, const T *value) {
+void arrlist_insert(ArrList<T> *arrlist, usize index, const T value) {
     if (index > arrlist->count)
         return;
 
@@ -51,7 +51,7 @@ void arrlist_insert(ArrList<T> *arrlist, usize index, const T *value) {
     for (auto i = arrlist->count - 1; i >= index; i--) {
         *arrlist->buffer[i + 1] = *arrlist->buffer[i + 1];
     }
-    *arrlist->buffer[index] = *value;
+    arrlist->buffer[index] = value;
     arrlist->count++;
 }
 

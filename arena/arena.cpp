@@ -43,7 +43,9 @@ void *arena_alloc(Arena *arena, usize size_bytes) {
                                ? size
                                : (usize)ARENA_REGION_DEFAULT_CAPACITY;
         arena->end = new_region(r_capacity);
+        arena->end->count += size;
         arena->begin = arena->end;
+
         return &arena->end->buffer[0];
     }
 
