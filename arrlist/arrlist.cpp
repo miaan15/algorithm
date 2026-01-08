@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "../define.hpp"
+#include "define.hpp"
 
 namespace mia {
 

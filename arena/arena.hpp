@@ -1,7 +1,7 @@
 #ifndef ARENA_HPP
 #define ARENA_HPP
 
-#include "../define.hpp"
+#include "define.hpp"
 
 namespace mia {
 

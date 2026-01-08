@@ -1,7 +1,7 @@
 #ifndef ARRLIST_HPP
 #define ARRLIST_HPP
 
-#include "../define.hpp"
+#include "define.hpp"
 
 namespace mia {
 

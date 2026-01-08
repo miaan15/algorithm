@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "../define.hpp"
+#include "define.hpp"
 
 #ifndef ARENA_REGION_DEFAULT_CAPACITY
 #define ARENA_REGION_DEFAULT_CAPACITY (8 * 1024)
