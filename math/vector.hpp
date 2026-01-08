@@ -72,39 +72,39 @@ using vector_scalar_t = f64;
 #endif
 
 template <typename T>
-Vec2<T> operator+(Vec2<T> a, Vec2<T> b) {
+Vec2<T> operator+(const Vec2<T> &a, const Vec2<T> &b) {
     return {a.x + b.x, a.y + b.y};
 }
 
 template <typename T>
-Vec2<T> operator-(Vec2<T> a, Vec2<T> b) {
+Vec2<T> operator-(const Vec2<T> &a, const Vec2<T> &b) {
     return {a.x - b.x, a.y - b.y};
 }
 
 template <typename T>
-Vec2<T> operator*(Vec2<T> v, vector_scalar_t scalar) {
+Vec2<T> operator*(const Vec2<T> &v, vector_scalar_t scalar) {
     return {v.x * scalar, v.y * scalar};
 }
 
 template <typename T>
-Vec2<T> operator*(vector_scalar_t scalar, Vec2<T> v) {
+Vec2<T> operator*(vector_scalar_t scalar, const Vec2<T> &v) {
     return {v.x * scalar, v.y * scalar};
 }
 
 template <typename T>
-Vec2<T> operator/(Vec2<T> v, vector_scalar_t scalar) {
+Vec2<T> operator/(const Vec2<T> &v, vector_scalar_t scalar) {
     return {v.x / scalar, v.y / scalar};
 }
 
 template <typename T>
-Vec2<T> &operator+=(Vec2<T> &a, Vec2<T> b) {
+Vec2<T> &operator+=(Vec2<T> &a, const Vec2<T> &b) {
     a.x += b.x;
     a.y += b.y;
     return a;
 }
 
 template <typename T>
-Vec2<T> &operator-=(Vec2<T> &a, Vec2<T> b) {
+Vec2<T> &operator-=(Vec2<T> &a, const Vec2<T> &b) {
     a.x -= b.x;
     a.y -= b.y;
     return a;
@@ -125,74 +125,73 @@ Vec2<T> &operator/=(Vec2<T> &v, vector_scalar_t scalar) {
 }
 
 template <typename T>
-bool operator==(Vec2<T> a, Vec2<T> b) {
+bool operator==(const Vec2<T> &a, const Vec2<T> &b) {
     return a.x == b.x && a.y == b.y;
 }
 
 template <typename T>
-bool operator!=(Vec2<T> a, Vec2<T> b) {
+bool operator!=(const Vec2<T> &a, const Vec2<T> &b) {
     return !(a == b);
 }
 
 template <typename T>
-vector_scalar_t dot(Vec2<T> a, Vec2<T> b) {
+vector_scalar_t dot(const Vec2<T> &a, const Vec2<T> &b) {
     return a.x * b.x + a.y * b.y;
 }
 
 template <typename T>
-vector_scalar_t length_squared(Vec2<T> v) {
+vector_scalar_t length_squared(const Vec2<T> &v) {
     return v.x * v.x + v.y * v.y;
 }
 
 template <typename T>
-vector_scalar_t length(Vec2<T> v) {
+vector_scalar_t length(const Vec2<T> &v) {
     return sqrt(length_squared(v));
 }
 
 template <typename T>
-Vec2<T> normalize(Vec2<T> v) {
+Vec2<T> normalize(const Vec2<T> &v) {
     vector_scalar_t len = length(v);
     return v / len;
 }
 
 template <typename T>
-vector_scalar_t distance(Vec2<T> a, Vec2<T> b) {
+vector_scalar_t distance(const Vec2<T> &a, const Vec2<T> &b) {
     return length(a - b);
 }
 
 template <typename T>
-vector_scalar_t distance_squared(Vec2<T> a, Vec2<T> b) {
+vector_scalar_t distance_squared(const Vec2<T> &a, const Vec2<T> &b) {
     return length_squared(a - b);
 }
 
-// Vec3 operator overloads
 template <typename T>
-Vec3<T> operator+(Vec3<T> a, Vec3<T> b) {
+Vec3<T> operator+(const Vec3<T> &a, const Vec3<T> &b) {
     return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
 template <typename T>
-Vec3<T> operator-(Vec3<T> a, Vec3<T> b) {
+Vec3<T> operator-(const Vec3<T> &a, const Vec3<T> &b) {
     return {a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
 template <typename T>
-Vec3<T> operator*(Vec3<T> v, vector_scalar_t scalar) {
+Vec3<T> operator*(const Vec3<T> &v, vector_scalar_t scalar) {
     return {v.x * scalar, v.y * scalar, v.z * scalar};
 }
 
 template <typename T>
-Vec3<T> operator*(vector_scalar_t scalar, Vec3<T> v) {
+Vec3<T> operator*(vector_scalar_t scalar, const Vec3<T> &v) {
     return {v.x * scalar, v.y * scalar, v.z * scalar};
 }
 
 template <typename T>
-Vec3<T> operator/(Vec3<T> v, vector_scalar_t scalar) {
+Vec3<T> operator/(const Vec3<T> &v, vector_scalar_t scalar) {
     return {v.x / scalar, v.y / scalar, v.z / scalar};
 }
 
 template <typename T>
-Vec3<T> &operator+=(Vec3<T> &a, Vec3<T> b) {
+Vec3<T> &operator+=(Vec3<T> &a, const Vec3<T> &b) {
     a.x += b.x;
     a.y += b.y;
     a.z += b.z;
@@ -200,7 +199,7 @@ Vec3<T> &operator+=(Vec3<T> &a, Vec3<T> b) {
 }
 
 template <typename T>
-Vec3<T> &operator-=(Vec3<T> &a, Vec3<T> b) {
+Vec3<T> &operator-=(Vec3<T> &a, const Vec3<T> &b) {
     a.x -= b.x;
     a.y -= b.y;
     a.z -= b.z;
@@ -224,43 +223,43 @@ Vec3<T> &operator/=(Vec3<T> &v, vector_scalar_t scalar) {
 }
 
 template <typename T>
-bool operator==(Vec3<T> a, Vec3<T> b) {
+bool operator==(const Vec3<T> &a, const Vec3<T> &b) {
     return a.x == b.x && a.y == b.y && a.z == b.z;
 }
 
 template <typename T>
-bool operator!=(Vec3<T> a, Vec3<T> b) {
+bool operator!=(const Vec3<T> &a, const Vec3<T> &b) {
     return !(a == b);
 }
 
 template <typename T>
-vector_scalar_t dot(Vec3<T> a, Vec3<T> b) {
+vector_scalar_t dot(const Vec3<T> &a, const Vec3<T> &b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 template <typename T>
-vector_scalar_t length_squared(Vec3<T> v) {
+vector_scalar_t length_squared(const Vec3<T> &v) {
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
 template <typename T>
-vector_scalar_t length(Vec3<T> v) {
+vector_scalar_t length(const Vec3<T> &v) {
     return sqrt(length_squared(v));
 }
 
 template <typename T>
-Vec3<T> normalize(Vec3<T> v) {
+Vec3<T> normalize(const Vec3<T> &v) {
     vector_scalar_t len = length(v);
     return v / len;
 }
 
 template <typename T>
-vector_scalar_t distance(Vec3<T> a, Vec3<T> b) {
+vector_scalar_t distance(const Vec3<T> &a, const Vec3<T> &b) {
     return length(a - b);
 }
 
 template <typename T>
-vector_scalar_t distance_squared(Vec3<T> a, Vec3<T> b) {
+vector_scalar_t distance_squared(const Vec3<T> &a, const Vec3<T> &b) {
     return length_squared(a - b);
 }
 
