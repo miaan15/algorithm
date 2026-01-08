@@ -28,7 +28,7 @@ void trim(ArrList<T> *arrlist);
 
 } // namespace mia
 
-#ifndef _SOURCE_FILE
+#ifndef ARRLIST_IMPLEMENTED
 #include "arrlist.cpp"
 #endif
 

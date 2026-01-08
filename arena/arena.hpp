@@ -5,16 +5,9 @@
 
 namespace mia {
 
-struct ArenaRegion {
-    ArenaRegion *next;
-    usize count;
-    usize capacity;
-    uptr buffer[];
-};
+struct ArenaRegion;
 
-struct Arena {
-    ArenaRegion *begin, *end;
-};
+struct Arena;
 
 void *arena_alloc(Arena *arena, usize size_bytes);
 void *arena_realloc(Arena *arena, const void *old_ptr, usize old_size_bytes,
@@ -24,5 +17,9 @@ void arena_reset(Arena *arena);
 void arena_trim_excessed(Arena *arena);
 
 } // namespace mia
+  
+#ifndef ARENA_IMPLEMENTED
+#include "arena.cpp"
+#endif
 
 #endif // ARENA_HPP

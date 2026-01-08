@@ -1,8 +1,7 @@
-#define _SOURCE_FILE
-#include "../define.hpp"
-
 #include <cstdlib>
 #include <cstring>
+
+#include "../define.hpp"
 
 namespace mia {
 

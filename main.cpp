@@ -1,6 +1,7 @@
+#include <cstdio>
+
 #include "arena/arena.hpp"
 #include "arrlist/arrlist.hpp"
-#include <cstdio>
 
 using namespace mia;
 
