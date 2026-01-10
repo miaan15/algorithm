@@ -119,34 +119,34 @@ bool operator!=(const Vec2<T> &a, const Vec2<T> &b) {
 }
 
 template <typename T>
-vector_scalar_t dot(const Vec2<T> &a, const Vec2<T> &b) {
+vector_scalar_t vector_dot(const Vec2<T> &a, const Vec2<T> &b) {
     return a.x * b.x + a.y * b.y;
 }
 
 template <typename T>
-vector_scalar_t length_squared(const Vec2<T> &v) {
+vector_scalar_t vector_length_squared(const Vec2<T> &v) {
     return v.x * v.x + v.y * v.y;
 }
 
 template <typename T>
-vector_scalar_t length(const Vec2<T> &v) {
-    return sqrt(length_squared(v));
+vector_scalar_t vector_length(const Vec2<T> &v) {
+    return sqrt(vector_length_squared(v));
 }
 
 template <typename T>
-Vec2<T> normalize(const Vec2<T> &v) {
-    vector_scalar_t len = length(v);
+Vec2<T> vector_normalize(const Vec2<T> &v) {
+    vector_scalar_t len = vector_length(v);
     return v / len;
 }
 
 template <typename T>
-vector_scalar_t distance(const Vec2<T> &a, const Vec2<T> &b) {
-    return length(a - b);
+vector_scalar_t vector_distance(const Vec2<T> &a, const Vec2<T> &b) {
+    return vector_length(a - b);
 }
 
 template <typename T>
-vector_scalar_t distance_squared(const Vec2<T> &a, const Vec2<T> &b) {
-    return length_squared(a - b);
+vector_scalar_t vector_distance_squared(const Vec2<T> &a, const Vec2<T> &b) {
+    return vector_length_squared(a - b);
 }
 
 template <typename T>
@@ -217,34 +217,34 @@ bool operator!=(const Vec3<T> &a, const Vec3<T> &b) {
 }
 
 template <typename T>
-vector_scalar_t dot(const Vec3<T> &a, const Vec3<T> &b) {
+vector_scalar_t vector_dot(const Vec3<T> &a, const Vec3<T> &b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 template <typename T>
-vector_scalar_t length_squared(const Vec3<T> &v) {
+vector_scalar_t vector_length_squared(const Vec3<T> &v) {
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
 template <typename T>
-vector_scalar_t length(const Vec3<T> &v) {
-    return sqrt(length_squared(v));
+vector_scalar_t vector_length(const Vec3<T> &v) {
+    return sqrt(vector_length_squared(v));
 }
 
 template <typename T>
-Vec3<T> normalize(const Vec3<T> &v) {
-    vector_scalar_t len = length(v);
+Vec3<T> vector_normalize(const Vec3<T> &v) {
+    vector_scalar_t len = vector_length(v);
     return v / len;
 }
 
 template <typename T>
-vector_scalar_t distance(const Vec3<T> &a, const Vec3<T> &b) {
-    return length(a - b);
+vector_scalar_t vector_distance(const Vec3<T> &a, const Vec3<T> &b) {
+    return vector_length(a - b);
 }
 
 template <typename T>
-vector_scalar_t distance_squared(const Vec3<T> &a, const Vec3<T> &b) {
-    return length_squared(a - b);
+vector_scalar_t vector_distance_squared(const Vec3<T> &a, const Vec3<T> &b) {
+    return vector_length_squared(a - b);
 }
 
 } // namespace mia

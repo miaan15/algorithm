@@ -24,29 +24,29 @@ using AABB3i = AABB3<i32>;
 using AABB3u = AABB3<u32>;
 
 template <typename T>
-Vec2<T> size(const AABB2<T> &box) {
+Vec2<T> aabb_size(const AABB2<T> &box) {
     return box.upper_bound - box.lower_bound;
 }
 
 template <typename T>
-vector_scalar_t area(const AABB2<T> &box) {
-    auto s = size(box);
+vector_scalar_t aabb_area(const AABB2<T> &box) {
+    auto s = aabb_size(box);
     return s.x * s.y;
 }
 
 template <typename T>
-Vec2<T> center(const AABB2<T> &box) {
+Vec2<T> aabb_center(const AABB2<T> &box) {
     return (box.lower_bound + box.upper_bound) / 2;
 }
 
 template <typename T>
-bool contains(const AABB2<T> &box, const Vec2<T> &point) {
+bool aabb_contains(const AABB2<T> &box, const Vec2<T> &point) {
     return point.x >= box.lower_bound.x && point.x <= box.upper_bound.x &&
            point.y >= box.lower_bound.y && point.y <= box.upper_bound.y;
 }
 
 template <typename T>
-AABB2<T> merge(const AABB2<T> &a, const AABB2<T> &b) {
+AABB2<T> aabb_merge(const AABB2<T> &a, const AABB2<T> &b) {
     return {{std::min(a.lower_bound.x, b.lower_bound.x),
              std::min(a.lower_bound.y, b.lower_bound.y)},
             {std::max(a.upper_bound.x, b.upper_bound.x),
@@ -54,7 +54,7 @@ AABB2<T> merge(const AABB2<T> &a, const AABB2<T> &b) {
 }
 
 template <typename T>
-bool intersects(const AABB2<T> &a, const AABB2<T> &b) {
+bool aabb_intersects(const AABB2<T> &a, const AABB2<T> &b) {
     return a.lower_bound.x <= b.upper_bound.x &&
            a.upper_bound.x >= b.lower_bound.x &&
            a.lower_bound.y <= b.upper_bound.y &&
@@ -62,30 +62,30 @@ bool intersects(const AABB2<T> &a, const AABB2<T> &b) {
 }
 
 template <typename T>
-Vec3<T> size(const AABB3<T> &box) {
+Vec3<T> aabb_size(const AABB3<T> &box) {
     return box.upper_bound - box.lower_bound;
 }
 
 template <typename T>
-vector_scalar_t volume(const AABB3<T> &box) {
-    auto s = size(box);
+vector_scalar_t aabb_volume(const AABB3<T> &box) {
+    auto s = aabb_size(box);
     return s.x * s.y * s.z;
 }
 
 template <typename T>
-Vec3<T> center(const AABB3<T> &box) {
+Vec3<T> aabb_center(const AABB3<T> &box) {
     return (box.lower_bound + box.upper_bound) / 2;
 }
 
 template <typename T>
-bool contains(const AABB3<T> &box, const Vec3<T> &point) {
+bool aabb_contains(const AABB3<T> &box, const Vec3<T> &point) {
     return point.x >= box.lower_bound.x && point.x <= box.upper_bound.x &&
            point.y >= box.lower_bound.y && point.y <= box.upper_bound.y &&
            point.z >= box.lower_bound.z && point.z <= box.upper_bound.z;
 }
 
 template <typename T>
-AABB3<T> merge(const AABB3<T> &a, const AABB3<T> &b) {
+AABB3<T> aabb_merge(const AABB3<T> &a, const AABB3<T> &b) {
     return {{std::min(a.lower_bound.x, b.lower_bound.x),
              std::min(a.lower_bound.y, b.lower_bound.y),
              std::min(a.lower_bound.z, b.lower_bound.z)},
@@ -95,7 +95,7 @@ AABB3<T> merge(const AABB3<T> &a, const AABB3<T> &b) {
 }
 
 template <typename T>
-bool intersects(const AABB3<T> &a, const AABB3<T> &b) {
+bool aabb_intersects(const AABB3<T> &a, const AABB3<T> &b) {
     return a.lower_bound.x <= b.upper_bound.x &&
            a.upper_bound.x >= b.lower_bound.x &&
            a.lower_bound.y <= b.upper_bound.y &&

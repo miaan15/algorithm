@@ -2,5 +2,6 @@
 #define MATH_H
 
 #include "vector.hpp"
+#include "aabb.hpp"
 
 #endif
