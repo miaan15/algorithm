@@ -11,29 +11,17 @@ template <typename T>
 struct AABB2 {
     Vec2<T> lower_bound, upper_bound;
 };
-#ifndef VECTOR_HIGH_PRECISION
 using AABB2f = AABB2<f32>;
 using AABB2i = AABB2<i32>;
 using AABB2u = AABB2<u32>;
-#else
-using AABB2f = AABB2<f64>;
-using AABB2i = AABB2<i64>;
-using AABB2u = AABB2<u64>;
-#endif
 
 template <typename T>
 struct AABB3 {
     Vec3<T> lower_bound, upper_bound;
 };
-#ifndef VECTOR_HIGH_PRECISION
 using AABB3f = AABB3<f32>;
 using AABB3i = AABB3<i32>;
 using AABB3u = AABB3<u32>;
-#else
-using AABB3f = AABB3<f64>;
-using AABB3i = AABB3<i64>;
-using AABB3u = AABB3<u64>;
-#endif
 
 template <typename T>
 Vec2<T> size(const AABB2<T> &box) {

@@ -26,15 +26,9 @@ using Vec2u64 = Vec2<u64>;
 using Vec2f32 = Vec2<f32>;
 using Vec2f64 = Vec2<f64>;
 
-#ifndef VECTOR_HIGH_PRECISION
 using Vec2f = Vec2<f32>;
 using Vec2i = Vec2<i32>;
 using Vec2u = Vec2<u32>;
-#else
-using Vec2f = Vec2<f64>;
-using Vec2i = Vec2<i64>;
-using Vec2u = Vec2<u64>;
-#endif
 
 template <typename T>
 union Vec3 {
@@ -55,21 +49,11 @@ using Vec3u64 = Vec3<u64>;
 using Vec3f32 = Vec3<f32>;
 using Vec3f64 = Vec3<f64>;
 
-#ifndef VECTOR_HIGH_PRECISION
 using Vec3f = Vec3<f32>;
 using Vec3i = Vec3<i32>;
 using Vec3u = Vec3<u32>;
-#else
-using Vec3f = Vec3<f64>;
-using Vec3i = Vec3<i64>;
-using Vec3u = Vec3<u64>;
-#endif
 
-#ifndef VECTOR_HIGH_PRECISION
 using vector_scalar_t = f32;
-#else
-using vector_scalar_t = f64;
-#endif
 
 template <typename T>
 Vec2<T> operator+(const Vec2<T> &a, const Vec2<T> &b) {
