@@ -24,7 +24,10 @@ template <typename T>
 void arrlist_clear(ArrList<T> *arrlist);
 
 template <typename T>
-void trim(ArrList<T> *arrlist);
+void arrlist_trim(ArrList<T> *arrlist);
+
+template <typename T>
+void arrlist_free(ArrList<T> *arrlist);
 
 } // namespace mia
 
