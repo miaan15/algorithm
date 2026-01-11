@@ -18,7 +18,7 @@ void arena_trim_excessed(Arena *arena);
 
 } // namespace mia
   
-#ifndef ARENA_IMPLEMENTED
+#ifdef ARENA_IMPLEMENTATION
 #include "arena.cpp"
 #endif
 

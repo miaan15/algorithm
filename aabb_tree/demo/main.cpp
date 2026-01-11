@@ -1,5 +1,8 @@
 #include "raylib.h"
 
+#define AABBTREE_IMPLEMENTED
+#include "../aabb_tree.hpp"
+
 int main(void) {
     InitWindow(800, 450, "raylib [core] example - basic window");
 

@@ -1,3 +1,4 @@
+#define ARRLIST_IMPLEMENTATION
 #include "arrlist.hpp"
 #include "define.hpp"
 #include "math.hpp"
