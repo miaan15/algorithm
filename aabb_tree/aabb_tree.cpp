@@ -72,6 +72,8 @@ void aabbtree_update(AABBTree *tree) {
         _aabbtree_insert_node_helper_recursive(node, node->data, tree,
                                                &tree->root);
     }
+
+    arrlist_free(&invalid_nodes);
 }
 
 bool _is_node_leaf(AABBTree_Node const &node) {
@@ -113,6 +115,7 @@ void _aabbtree_insert_node_helper_recursive(AABBTree_Node *node,
         _aabbtree_insert_node_helper_recursive(node, aabb, tree,
                                                &cur->childs[1]);
     }
+    cur->bound = aabb_merge(cur->childs[0]->bound, cur->childs[1]->bound);
 }
 
 void _update_invalid_nodes_helper_recursive(

@@ -16,18 +16,53 @@ void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes,
     debug_boxes_helper_recursive(boxes, cur_node->childs[1], depth + 1);
 }
 
+void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
+                            float screen_height) {
+    float speed = vector_length(*velocity);
+    bool hit_edge = false;
+
+    if (aabb->min.x < 0) {
+        aabb->max.x += -aabb->min.x;
+        aabb->min.x = 0;
+        hit_edge = true;
+    } else if (aabb->max.x > screen_width) {
+        aabb->min.x -= (aabb->max.x - screen_width);
+        aabb->max.x = screen_width;
+        hit_edge = true;
+    }
+
+    if (aabb->min.y < 0) {
+        aabb->max.y += -aabb->min.y;
+        aabb->min.y = 0;
+        hit_edge = true;
+    } else if (aabb->max.y > screen_height) {
+        aabb->min.y -= (aabb->max.y - screen_height);
+        aabb->max.y = screen_height;
+        hit_edge = true;
+    }
+
+    if (hit_edge) {
+        float angle = GetRandomValue(0, 360) * DEG2RAD;
+        velocity->x = cos(angle) * speed;
+        velocity->y = sin(angle) * speed;
+    }
+}
+
 int main(void) {
     AABBTree tree{};
-    AABB2f aabbs[10];
+    tree.margin = 10.0;
+
+    AABB2f aabbs[36];
+    Vec2f aabb_vecs[36];
 
     InitWindow(1280, 720, "aabbtree demo");
+    SetTargetFPS(60);
 
-    // Randomly generate aabbs in field 1280 x 720
-    for (auto i = 0; i < 10; i++) {
-        float minX = GetRandomValue(0 + 100, 1280 - 100 - 100);
-        float minY = GetRandomValue(0 + 100, 720 - 100 - 100);
-        float maxX = minX + GetRandomValue(20, 100);
-        float maxY = minY + GetRandomValue(20, 100);
+    for (auto i = 0; i < 36; i++) {
+        float minX = GetRandomValue(0 + 100, 1280 - 20 - 100);
+        float minY = GetRandomValue(0 + 100, 720 - 20 - 100);
+        float maxX = minX + GetRandomValue(5, 20);
+        float maxY = minY + GetRandomValue(5, 20);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -35,42 +70,62 @@ int main(void) {
         aabbtree_insert(&tree, &aabbs[i]);
     }
 
-    std::vector<std::pair<AABB2f, usize>> debug_boxes;
-    debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
+    // Randomly generate initialize aabb's velocities
+    for (auto i = 0; i < 36; i++) {
+        float speed = GetRandomValue(50, 200);
+        float angle = GetRandomValue(0, 360) * DEG2RAD;
+        aabb_vecs[i].x = cos(angle) * speed;
+        aabb_vecs[i].y = sin(angle) * speed;
+    }
+
     Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
+    usize r_idx = 0;
     while (!WindowShouldClose()) {
+        float dt = GetFrameTime();
+
+        for (auto i = 0; i < 36; i++) {
+            Vec2f displacement = aabb_vecs[i] * dt;
+            aabbs[i].min += displacement;
+            aabbs[i].max += displacement;
+
+            handle_aabb_hit_bounds(&aabbs[i], &aabb_vecs[i], 1280, 720);
+        }
+
+        aabbtree_update(&tree);
+
+        std::vector<std::pair<AABB2f, usize>> debug_boxes;
+        debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Render base aabbs as filled rectangle with color = BLUE
-        for (auto i = 0; i < 10; i++) {
-            DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
-                          aabbs[i].max.x - aabbs[i].min.x,
-                          aabbs[i].max.y - aabbs[i].min.y, BLUE);
-        }
-
-        // Render debug_boxes as border rectangle with color = depth % 5 of
-        // debug_box_color; make the filled inside transparent 20% if possible
         for (const auto &[aabb, depth] : debug_boxes) {
             Color border_color = debug_box_color[depth % 7];
             Color fill_color = border_color;
-            fill_color.a = 30;
+            fill_color.a = 10;
 
-            f32 offset_scale = 1.0;
+            f32 offset_scale = 0;
             Rectangle rect = {
                 aabb.min.x - depth * offset_scale,
                 aabb.min.y - depth * offset_scale,
                 aabb.max.x - aabb.min.x + depth * offset_scale * 2,
                 aabb.max.y - aabb.min.y + depth * offset_scale * 2};
 
-            // Draw filled rectangle with transparency
             DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
-
-            // Draw border
-            DrawRectangleLines(rect.x, rect.y, rect.width, rect.height,
-                               border_color);
+            DrawRectangleLinesEx(rect, 1.0, border_color);
         }
+
+        for (auto i = 0; i < 36; i++) {
+            DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
+                          aabbs[i].max.x - aabbs[i].min.x,
+                          aabbs[i].max.y - aabbs[i].min.y, BLUE);
+            DrawRectangleLines(aabbs[i].min.x, aabbs[i].min.y,
+                               aabbs[i].max.x - aabbs[i].min.x,
+                               aabbs[i].max.y - aabbs[i].min.y, BLACK);
+        }
+
+        DrawFPS(10, 10);
 
         EndDrawing();
     }
