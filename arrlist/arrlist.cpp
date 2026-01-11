@@ -13,6 +13,31 @@ struct ArrList {
 };
 
 template <typename T>
+T *begin(ArrList<T> &arrlist) {
+    return arrlist.buffer;
+}
+template <typename T>
+T *end(ArrList<T> &arrlist) {
+    return arrlist.buffer + arrlist.count;
+}
+template <typename T>
+const T *begin(ArrList<T> const& arrlist) {
+    return arrlist.buffer;
+}
+template <typename T>
+const T *end(ArrList<T> const& arrlist) {
+    return arrlist.buffer + arrlist.count;
+}
+template <typename T>
+const T *cbegin(ArrList<T> const& arrlist) {
+    return arrlist.buffer;
+}
+template <typename T>
+const T *cend(ArrList<T> const& arrlist) {
+    return arrlist.buffer + arrlist.count;
+}
+
+template <typename T>
 void arrlist_reserve(ArrList<T> *arrlist, usize new_capacity) {
     cauto old_capacity = arrlist->capacity;
     cauto old_buffer = arrlist->buffer;
