@@ -22,8 +22,4 @@ using usize = size_t;
 using iptr = intptr_t;
 using uptr = uintptr_t;
 
-#ifdef _SOURCE_FILE
-using namespace std;
-#endif
-
 #endif // DEFINE_HPP
