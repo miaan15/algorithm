@@ -1,7 +1,6 @@
+#include "arrlist.hpp"
 #include "define.hpp"
 #include "math.hpp"
-
-#include "../arrlist/arrlist.hpp"
 
 namespace mia {
 
@@ -35,7 +34,11 @@ void aabbtree_update(AABBTree *tree) {
         return;
 
     if (_is_node_leaf(*tree->root)) {
-        // TODO: update bound
+        auto &root = tree->root;
+        root->bound = {
+            {root->data->lower_bound - (Vec2f){tree->margin, tree->margin}},
+            {root->data->upper_bound + (Vec2f){tree->margin, tree->margin}}};
+
         return;
     }
 
