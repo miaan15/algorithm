@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++23 -Wall -Wextra
+CXXFLAGS = -std=c++23 -Wall -Wextra -g
 
 BUILD_DIR = ./build
 
@@ -20,4 +20,6 @@ $(BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean
+rebuild: clean all
+
+.PHONY: all clean rebuild
