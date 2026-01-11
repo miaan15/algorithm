@@ -10,7 +10,7 @@ struct AABBTree_Node;
 
 struct AABBTree;
 
-void aabb_insert(AABBTree *tree, AABB2f *aabb);
+void aabbtree_insert(AABBTree *tree, AABB2f *aabb);
 void aabbtree_update(AABBTree *tree);
 
 } // namespace mia

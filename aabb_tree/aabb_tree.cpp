@@ -19,14 +19,14 @@ struct AABBTree {
 };
 
 bool _is_node_leaf(AABBTree_Node const &node);
-void _aabb_insert_node_helper_recursive(AABBTree_Node *node, AABB2f *const aabb,
+void _aabbtree_insert_node_helper_recursive(AABBTree_Node *node, AABB2f *const aabb,
                                         AABBTree *tree,
                                         AABBTree_Node **cur_link);
 void _update_invalid_nodes_helper_recursive(
     ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur);
 
-void aabb_insert(AABBTree *tree, AABB2f *aabb) {
-    _aabb_insert_node_helper_recursive(new AABBTree_Node{}, aabb, tree,
+void aabbtree_insert(AABBTree *tree, AABB2f *aabb) {
+    _aabbtree_insert_node_helper_recursive(new AABBTree_Node{}, aabb, tree,
                                        &tree->root);
 }
 
@@ -37,8 +37,8 @@ void aabbtree_update(AABBTree *tree) {
     if (_is_node_leaf(*tree->root)) {
         auto &root = tree->root;
         root->bound = {
-            {root->data->lower_bound - (Vec2f){tree->margin, tree->margin}},
-            {root->data->upper_bound + (Vec2f){tree->margin, tree->margin}}};
+            {root->data->min - (Vec2f){tree->margin, tree->margin}},
+            {root->data->max + (Vec2f){tree->margin, tree->margin}}};
 
         return;
     }
@@ -59,7 +59,7 @@ void aabbtree_update(AABBTree *tree) {
         *parent_link = sibling;
         delete parent;
 
-        _aabb_insert_node_helper_recursive(node, node->data, tree, &tree->root);
+        _aabbtree_insert_node_helper_recursive(node, node->data, tree, &tree->root);
     }
 }
 
@@ -67,14 +67,14 @@ bool _is_node_leaf(AABBTree_Node const &node) {
     return node.childs[0] == nullptr && node.childs[1] == nullptr;
 }
 
-void _aabb_insert_node_helper_recursive(AABBTree_Node *node, AABB2f *const aabb,
+void _aabbtree_insert_node_helper_recursive(AABBTree_Node *node, AABB2f *const aabb,
                                         AABBTree *tree,
                                         AABBTree_Node **cur_link) {
     auto cur = *cur_link;
     if (_is_node_leaf(*cur)) {
         node->bound = {
-            {aabb->lower_bound - (Vec2f){tree->margin, tree->margin}},
-            {aabb->upper_bound + (Vec2f){tree->margin, tree->margin}}};
+            {aabb->min - (Vec2f){tree->margin, tree->margin}},
+            {aabb->max + (Vec2f){tree->margin, tree->margin}}};
         node->data = aabb;
 
         auto new_parent = new AABBTree_Node{};
@@ -97,9 +97,9 @@ void _aabb_insert_node_helper_recursive(AABBTree_Node *node, AABB2f *const aabb,
     cauto bound_diff_1 = aabb_volume(aabb_merge(cur->childs[1]->bound, *aabb)) -
                          aabb_volume(cur->childs[1]->bound);
     if (bound_diff_0 < bound_diff_1) {
-        _aabb_insert_node_helper_recursive(node, aabb, tree, &cur->childs[0]);
+        _aabbtree_insert_node_helper_recursive(node, aabb, tree, &cur->childs[0]);
     } else {
-        _aabb_insert_node_helper_recursive(node, aabb, tree, &cur->childs[1]);
+        _aabbtree_insert_node_helper_recursive(node, aabb, tree, &cur->childs[1]);
     }
 }
 
