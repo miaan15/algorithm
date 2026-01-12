@@ -120,6 +120,12 @@ void _aabbtree_all_collide_pair_helper(
     }
 
     if (!aabb_intersects(node0->bound, node1->bound)) {
+        if (!_is_node_leaf(*node0))
+            _aabbtree_handle_self_collide_pair(node0, list, checked_childs_set);
+
+        if (!_is_node_leaf(*node1))
+            _aabbtree_handle_self_collide_pair(node1, list, checked_childs_set);
+
         return;
     }
 

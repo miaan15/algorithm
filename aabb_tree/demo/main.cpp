@@ -50,9 +50,9 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 20.0;
+    tree.margin = 5.0;
 
-    constexpr usize cnt = 10;
+    constexpr usize cnt = 3600;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
@@ -60,10 +60,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 100, 1280 - 150 - 100);
-        float minY = GetRandomValue(0 + 100, 720 - 150 - 100);
-        float maxX = minX + GetRandomValue(80, 150);
-        float maxY = minY + GetRandomValue(80, 150);
+        float minX = GetRandomValue(0 + 100, 1280 - 10 - 100);
+        float minY = GetRandomValue(0 + 100, 720 - 10 - 100);
+        float maxX = minX + GetRandomValue(10, 20);
+        float maxY = minY + GetRandomValue(10, 20);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -72,7 +72,7 @@ int main(void) {
     }
 
     for (auto i = 0; i < cnt; i++) {
-        float speed = GetRandomValue(10, 100);
+        float speed = GetRandomValue(80, 200);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
@@ -99,22 +99,22 @@ int main(void) {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
-        for (const auto &[aabb, depth] : debug_boxes) {
-            Color border_color = debug_box_color[depth % 7];
-            Color fill_color = border_color;
-            fill_color.a = 10;
-
-            f32 offset_scale = 0;
-            Rectangle rect = {
-                aabb.min.x - depth * offset_scale,
-                aabb.min.y - depth * offset_scale,
-                aabb.max.x - aabb.min.x + depth * offset_scale * 2,
-                aabb.max.y - aabb.min.y + depth * offset_scale * 2};
-
-            DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
-            DrawRectangleLinesEx(rect, 1.0, border_color);
-        }
+        //
+        // for (const auto &[aabb, depth] : debug_boxes) {
+        //     Color border_color = debug_box_color[depth % 7];
+        //     Color fill_color = border_color;
+        //     fill_color.a = 10;
+        //
+        //     f32 offset_scale = 0;
+        //     Rectangle rect = {
+        //         aabb.min.x - depth * offset_scale,
+        //         aabb.min.y - depth * offset_scale,
+        //         aabb.max.x - aabb.min.x + depth * offset_scale * 2,
+        //         aabb.max.y - aabb.min.y + depth * offset_scale * 2};
+        //
+        //     DrawRectangle(rect.x, rect.y, rect.width, rect.height,
+        //     fill_color); DrawRectangleLinesEx(rect, 1.0, border_color);
+        // }
 
         for (auto i = 0; i < cnt; i++) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
