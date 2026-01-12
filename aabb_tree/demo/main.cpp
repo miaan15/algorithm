@@ -6,18 +6,15 @@
 
 using namespace mia;
 
-void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes,
-                                  _private::Node *cur_node, usize depth) {
+void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, _private::Node *cur_node, usize depth) {
     boxes->emplace_back(std::make_pair(cur_node->bound, depth));
 
-    if (!cur_node->childs[0] || !cur_node->childs[1])
-        return;
+    if (!cur_node->childs[0] || !cur_node->childs[1]) return;
     debug_boxes_helper_recursive(boxes, cur_node->childs[0], depth + 1);
     debug_boxes_helper_recursive(boxes, cur_node->childs[1], depth + 1);
 }
 
-void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
-                            float screen_height) {
+void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width, float screen_height) {
     float speed = vector_length(*velocity);
     bool hit_edge = false;
 
@@ -50,20 +47,20 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 2.0;
+    tree.margin = 7.0;
 
-    constexpr usize cnt = 60000;
+    constexpr usize cnt = 10000;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
-    InitWindow(1280, 720, "aabbtree demo");
+    InitWindow(1600, 900, "aabbtree demo");
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 3, 1280 - 3 - 3);
-        float minY = GetRandomValue(0 + 3, 720 - 3 - 3);
-        float maxX = minX + GetRandomValue(1, 3);
-        float maxY = minY + GetRandomValue(1, 3);
+        float minX = GetRandomValue(0 + 1, 1600 - 8 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 8 - 1);
+        float maxX = minX + GetRandomValue(2, 8);
+        float maxY = minY + GetRandomValue(2, 8);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -80,6 +77,7 @@ int main(void) {
 
     // Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
+    SetTargetFPS(6736);
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
@@ -88,7 +86,7 @@ int main(void) {
             aabbs[i].min += displacement;
             aabbs[i].max += displacement;
 
-            handle_aabb_hit_bounds(&aabbs[i], &aabb_vecs[i], 1280, 720);
+            handle_aabb_hit_bounds(&aabbs[i], &aabb_vecs[i], 1600, 900);
         }
 
         aabbtree::update(&tree);
@@ -117,22 +115,16 @@ int main(void) {
         // }
 
         for (auto i = 0U; i < cnt; i++) {
-            DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
-                          aabbs[i].max.x - aabbs[i].min.x,
-                          aabbs[i].max.y - aabbs[i].min.y, BLUE);
-            DrawRectangleLines(aabbs[i].min.x, aabbs[i].min.y,
-                               aabbs[i].max.x - aabbs[i].min.x,
-                               aabbs[i].max.y - aabbs[i].min.y, BLACK);
+            DrawRectangle(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLUE);
+            DrawRectangleLines(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLACK);
         }
 
         for (cauto &pair : pair_list) {
             Color color = RED;
             color.a = 200;
-            DrawRectangle(pair.first->min.x, pair.first->min.y,
-                          pair.first->max.x - pair.first->min.x,
+            DrawRectangle(pair.first->min.x, pair.first->min.y, pair.first->max.x - pair.first->min.x,
                           pair.first->max.y - pair.first->min.y, color);
-            DrawRectangle(pair.second->min.x, pair.second->min.y,
-                          pair.second->max.x - pair.second->min.x,
+            DrawRectangle(pair.second->min.x, pair.second->min.y, pair.second->max.x - pair.second->min.x,
                           pair.second->max.y - pair.second->min.y, color);
         }
         arrlist_free(&pair_list);
