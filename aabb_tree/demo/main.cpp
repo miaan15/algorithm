@@ -1,5 +1,5 @@
 #define AABBTREE_IMPLEMENTATION
-#include "../aabb_tree.hpp"
+#include "../aabbtree.hpp"
 
 #include "raylib.h"
 #include <vector>

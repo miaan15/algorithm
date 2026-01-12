@@ -27,15 +27,17 @@ struct AABBPair {
 using AABBPairList = ArrList<AABBPair>;
 #endif
 
-bool _is_node_leaf(AABBTree_Node const &node);
+// =========================================================
+bool _aabbtree_is_node_leaf(const AABBTree_Node &node);
 void _aabbtree_insert_node_helper(AABBTree_Node *node, AABB2f *const aabb,
                                   AABBTree *tree, AABBTree_Node **cur_link);
-void _update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list,
-                                  AABBTree_Node *cur);
+void _aabbtree_update_invalid_nodes_helper(
+    ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur);
 void _aabbtree_all_collide_pair_helper(
     AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1,
     std::unordered_set<AABBTree_Node *> *checked_childs_set);
 
+// =========================================================
 void aabbtree_insert(AABBTree *tree, AABB2f *aabb) {
     if (tree->root == nullptr) {
         auto node = new AABBTree_Node{};
@@ -55,7 +57,7 @@ void aabbtree_update(AABBTree *tree) {
     if (tree->root == nullptr)
         return;
 
-    if (_is_node_leaf(*tree->root)) {
+    if (_aabbtree_is_node_leaf(*tree->root)) {
         auto &root = tree->root;
         root->bound = {{root->data->min - (Vec2f){tree->margin, tree->margin}},
                        {root->data->max + (Vec2f){tree->margin, tree->margin}}};
@@ -64,7 +66,7 @@ void aabbtree_update(AABBTree *tree) {
     }
 
     ArrList<AABBTree_Node *> invalid_nodes = {};
-    _update_invalid_nodes_helper(&invalid_nodes, tree->root);
+    _aabbtree_update_invalid_nodes_helper(&invalid_nodes, tree->root);
 
     for (auto node : invalid_nodes) {
         cauto parent = node->parent;
@@ -90,7 +92,7 @@ AABBPairList aabbtree_all_collide_pair(AABBTree *tree) {
 
     if (tree->root == nullptr)
         return res;
-    if (_is_node_leaf(*tree->root))
+    if (_aabbtree_is_node_leaf(*tree->root))
         return res;
 
     std::unordered_set<AABBTree_Node *> checked_childs_set{};
@@ -100,6 +102,7 @@ AABBPairList aabbtree_all_collide_pair(AABBTree *tree) {
     return res;
 }
 
+// =========================================================
 void _aabbtree_handle_self_collide_pair(
     AABBTree_Node *node, AABBPairList *list,
     std::unordered_set<AABBTree_Node *> *checked_childs_set) {
@@ -112,7 +115,7 @@ void _aabbtree_handle_self_collide_pair(
 void _aabbtree_all_collide_pair_helper(
     AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1,
     std::unordered_set<AABBTree_Node *> *checked_childs_set) {
-    if (_is_node_leaf(*node0) && _is_node_leaf(*node1)) {
+    if (_aabbtree_is_node_leaf(*node0) && _aabbtree_is_node_leaf(*node1)) {
         if (aabb_intersects(*node0->data, *node1->data)) {
             arrlist_append(list, {node0->data, node1->data});
         }
@@ -120,16 +123,16 @@ void _aabbtree_all_collide_pair_helper(
     }
 
     if (!aabb_intersects(node0->bound, node1->bound)) {
-        if (!_is_node_leaf(*node0))
+        if (!_aabbtree_is_node_leaf(*node0))
             _aabbtree_handle_self_collide_pair(node0, list, checked_childs_set);
 
-        if (!_is_node_leaf(*node1))
+        if (!_aabbtree_is_node_leaf(*node1))
             _aabbtree_handle_self_collide_pair(node1, list, checked_childs_set);
 
         return;
     }
 
-    if (_is_node_leaf(*node0)) {
+    if (_aabbtree_is_node_leaf(*node0)) {
         _aabbtree_handle_self_collide_pair(node1, list, checked_childs_set);
 
         _aabbtree_all_collide_pair_helper(list, node0, node1->childs[0],
@@ -139,7 +142,7 @@ void _aabbtree_all_collide_pair_helper(
 
         return;
     }
-    if (_is_node_leaf(*node1)) {
+    if (_aabbtree_is_node_leaf(*node1)) {
         _aabbtree_handle_self_collide_pair(node0, list, checked_childs_set);
 
         _aabbtree_all_collide_pair_helper(list, node0->childs[0], node1,
@@ -163,14 +166,14 @@ void _aabbtree_all_collide_pair_helper(
                                       checked_childs_set);
 }
 
-bool _is_node_leaf(AABBTree_Node const &node) {
+bool _aabbtree_is_node_leaf(const AABBTree_Node &node) {
     return node.childs[0] == nullptr && node.childs[1] == nullptr;
 }
 
 void _aabbtree_insert_node_helper(AABBTree_Node *node, AABB2f *const aabb,
                                   AABBTree *tree, AABBTree_Node **cur_link) {
     auto cur = *cur_link;
-    if (_is_node_leaf(*cur)) {
+    if (_aabbtree_is_node_leaf(*cur)) {
         node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}},
                        {aabb->max + (Vec2f){tree->margin, tree->margin}}};
         node->data = aabb;
@@ -202,15 +205,15 @@ void _aabbtree_insert_node_helper(AABBTree_Node *node, AABB2f *const aabb,
     cur->bound = aabb_merge(cur->childs[0]->bound, cur->childs[1]->bound);
 }
 
-void _update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list,
-                                  AABBTree_Node *cur) {
-    if (_is_node_leaf(*cur)) {
+void _aabbtree_update_invalid_nodes_helper(
+    ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur) {
+    if (_aabbtree_is_node_leaf(*cur)) {
         if (!aabb_contains(cur->bound, *cur->data)) {
             arrlist_append(invalid_list, cur);
         }
     } else {
-        _update_invalid_nodes_helper(invalid_list, cur->childs[0]);
-        _update_invalid_nodes_helper(invalid_list, cur->childs[1]);
+        _aabbtree_update_invalid_nodes_helper(invalid_list, cur->childs[0]);
+        _aabbtree_update_invalid_nodes_helper(invalid_list, cur->childs[1]);
     }
 }
 

@@ -24,7 +24,7 @@ AABBPairList aabbtree_all_collide_pair(AABBTree *tree);
 } // namespace mia
 
 #ifdef AABBTREE_IMPLEMENTATION
-#include "aabb_tree.cpp"
+#include "aabbtree.cpp"
 #endif
 
 #endif // AABBTREE_HPP
