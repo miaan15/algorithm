@@ -15,7 +15,7 @@ void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, 
 }
 
 void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width, float screen_height) {
-    float speed = vector_length(*velocity);
+    float speed = vector::length(*velocity);
     bool hit_edge = false;
 
     if (aabb->min.x < 0) {

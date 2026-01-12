@@ -65,7 +65,7 @@ void insert(AABBTree *tree, AABB2f *aabb) {
     }
 
     cauto fat_bound = (AABB2f){{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-    auto best = (FitNodeValue){.node = tree->root, .link = &tree->root, .value = aabb_volume(aabb_merge(fat_bound, tree->root->bound))};
+    auto best = (FitNodeValue){.node = tree->root, .link = &tree->root, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
     find_best_fit_node_insert_helper(&best, fat_bound, tree->root, &tree->root, 0);
 
     auto node = new Node{};
@@ -73,7 +73,7 @@ void insert(AABBTree *tree, AABB2f *aabb) {
     node->data = aabb;
 
     auto new_parent = new Node{};
-    new_parent->bound = aabb_merge(best.node->bound, node->bound);
+    new_parent->bound = aabb::merge(best.node->bound, node->bound);
 
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
@@ -135,7 +135,7 @@ void update(AABBTree *tree) {
 
 void _private::find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f &bound, Node *cur, Node **cur_link,
                                                 f32 accumulate_delta) {
-    cauto cur_value = aabb_volume(aabb_merge(bound, cur->bound)) + accumulate_delta;
+    cauto cur_value = aabb::volume(aabb::merge(bound, cur->bound)) + accumulate_delta;
     if (cur_value < best->value) {
         best->node = cur;
         best->link = cur_link;
@@ -144,8 +144,8 @@ void _private::find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f
 
     if (is_node_leaf(*cur)) return;
 
-    cauto cur_delta = aabb_volume(aabb_merge(bound, cur->bound)) - aabb_volume(cur->bound);
-    if (aabb_volume(bound) + cur_delta + accumulate_delta < best->value) {
+    cauto cur_delta = aabb::volume(aabb::merge(bound, cur->bound)) - aabb::volume(cur->bound);
+    if (aabb::volume(bound) + cur_delta + accumulate_delta < best->value) {
         find_best_fit_node_insert_helper(best, bound, cur->childs[0], &cur->childs[0], accumulate_delta + cur_delta);
         find_best_fit_node_insert_helper(best, bound, cur->childs[1], &cur->childs[1], accumulate_delta + cur_delta);
     }
@@ -163,14 +163,14 @@ void _private::insert_node_from_old(AABBTree *tree, Node *node) {
     }
 
     cauto fat_bound = (AABB2f){{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-    auto best = (FitNodeValue){.node = tree->root, .link = nullptr, .value = aabb_volume(aabb_merge(fat_bound, tree->root->bound))};
+    auto best = (FitNodeValue){.node = tree->root, .link = nullptr, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
     find_best_fit_node_insert_helper(&best, fat_bound, tree->root, nullptr, 0);
 
     node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
     node->data = aabb;
 
     auto new_parent = new Node{};
-    new_parent->bound = aabb_merge(best.node->bound, node->bound);
+    new_parent->bound = aabb::merge(best.node->bound, node->bound);
 
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
@@ -186,7 +186,7 @@ void _private::insert_node_from_old(AABBTree *tree, Node *node) {
 
 void _private::update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur) {
     if (is_node_leaf(*cur)) {
-        if (!aabb_contains(cur->bound, *cur->data)) {
+        if (!aabb::contains(cur->bound, *cur->data)) {
             arrlist::append(invalid_list, cur);
         }
     } else {
@@ -213,13 +213,13 @@ void _private::uncheck_all_node_flag_helper(Node *node) {
 
 void _private::get_collided_pairs_helper(AABBPairList *list, Node *node0, Node *node1) {
     if (is_node_leaf(*node0) && is_node_leaf(*node1)) {
-        if (aabb_intersects(*node0->data, *node1->data)) {
+        if (aabb::intersects(*node0->data, *node1->data)) {
             arrlist::append(list, {node0->data, node1->data});
         }
         return;
     }
 
-    if (!aabb_intersects(node0->bound, node1->bound)) {
+    if (!aabb::intersects(node0->bound, node1->bound)) {
         if (!is_node_leaf(*node0)) handle_self_collide_pair(node0, list);
 
         if (!is_node_leaf(*node1)) handle_self_collide_pair(node1, list);
