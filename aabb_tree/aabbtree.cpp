@@ -11,7 +11,8 @@ using namespace _private;
 #ifndef AABBTREE_IMPLEMENTATION
 namespace _private {
 struct Node;
-} // namespace _
+struct FitNodeValue;
+} // namespace _private
 
 struct AABBTree {
     Node *root;
@@ -32,18 +33,23 @@ struct _private::Node {
 
     bool is_self_check;
 };
+struct _private::FitNodeValue {
+    Node *node;
+    Node **link;
+    f32 value;
+};
 #endif
 
 // =========================================================
 
 namespace _private {
 [[nodiscard]] auto is_node_leaf(const Node &node) -> bool;
-void insert_node_helper(Node *node, AABB2f *const aabb, AABBTree *tree, Node **cur_link);
+void find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f &bound, Node *cur, Node **cur_link, f32 accumulate_delta);
 void update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur);
 void all_collide_pair_helper(AABBPairList *list, Node *node0, Node *node1);
 void uncheck_all_node_flag_helper(Node *node);
 void handle_self_collide_pair(Node *node, AABBPairList *list);
-} // namespace _
+} // namespace _private
 
 // =========================================================
 namespace aabbtree {
@@ -58,7 +64,27 @@ void insert(AABBTree *tree, AABB2f *aabb) {
         return;
     }
 
-    insert_node_helper(new Node{}, aabb, tree, &tree->root);
+    cauto fat_bound = (AABB2f){{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
+    auto best = (FitNodeValue){.node = tree->root, .link = nullptr, .value = aabb_volume(aabb_merge(fat_bound, tree->root->bound))};
+    find_best_fit_node_insert_helper(&best, fat_bound, tree->root, nullptr, 0);
+
+    auto node = new Node{};
+    node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
+    node->data = aabb;
+
+    auto new_parent = new Node{};
+    new_parent->bound = aabb_merge(best.node->bound, node->bound);
+
+    new_parent->parent = best.node->parent;
+    new_parent->childs[0] = best.node;
+    new_parent->childs[1] = node;
+
+    best.node->parent = new_parent;
+    node->parent = new_parent;
+
+    if (best.link != nullptr) {
+        *best.link = new_parent;
+    }
 }
 
 void update(AABBTree *tree) {
@@ -109,35 +135,22 @@ void update(AABBTree *tree) {
     return node.childs[0] == nullptr && node.childs[1] == nullptr;
 }
 
-void _private::insert_node_helper(Node *node, AABB2f *const aabb, AABBTree *tree, Node **cur_link) {
-    auto cur = *cur_link;
-    if (is_node_leaf(*cur)) {
-        node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-        node->data = aabb;
-
-        auto new_parent = new Node{};
-        new_parent->bound = aabb_merge(cur->bound, node->bound);
-
-        new_parent->parent = cur->parent;
-        new_parent->childs[0] = cur;
-        new_parent->childs[1] = node;
-
-        cur->parent = new_parent;
-        node->parent = new_parent;
-
-        *cur_link = new_parent;
-
-        return;
+void _private::find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f &bound, Node *cur, Node **cur_link,
+                                                f32 accumulate_delta) {
+    cauto cur_value = aabb_volume(aabb_merge(bound, cur->bound)) + accumulate_delta;
+    if (cur_value < best->value) {
+        best->node = cur;
+        best->link = cur_link;
+        best->value = cur_value;
     }
 
-    cauto bound_diff_0 = aabb_volume(aabb_merge(cur->childs[0]->bound, *aabb)) - aabb_volume(cur->childs[0]->bound);
-    cauto bound_diff_1 = aabb_volume(aabb_merge(cur->childs[1]->bound, *aabb)) - aabb_volume(cur->childs[1]->bound);
-    if (bound_diff_0 < bound_diff_1) {
-        insert_node_helper(node, aabb, tree, &cur->childs[0]);
-    } else {
-        insert_node_helper(node, aabb, tree, &cur->childs[1]);
+    if (is_node_leaf(*cur)) return;
+
+    cauto cur_delta = aabb_volume(aabb_merge(bound, cur->bound)) - aabb_volume(cur->bound);
+    if (aabb_volume(bound) + cur_delta + accumulate_delta < best->value) {
+        find_best_fit_node_insert_helper(best, bound, cur->childs[0], &cur->childs[0], accumulate_delta + cur_delta);
+        find_best_fit_node_insert_helper(best, bound, cur->childs[1], &cur->childs[1], accumulate_delta + cur_delta);
     }
-    cur->bound = aabb_merge(cur->childs[0]->bound, cur->childs[1]->bound);
 }
 
 void _private::update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur) {

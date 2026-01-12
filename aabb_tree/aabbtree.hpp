@@ -10,7 +10,8 @@ namespace mia {
 
 namespace _private {
 struct Node;
-} // namespace _
+struct FitNodeValue;
+} // namespace _private
 
 struct AABBTree {
     _private::Node *root;
@@ -30,6 +31,11 @@ struct _private::Node {
     AABB2f *data;
 
     bool is_self_check;
+};
+struct _private::FitNodeValue {
+    Node *node;
+    Node **link;
+    f32 value;
 };
 
 namespace aabbtree {

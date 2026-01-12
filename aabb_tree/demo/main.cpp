@@ -52,7 +52,7 @@ int main(void) {
     AABBTree tree{};
     tree.margin = 2.0;
 
-    constexpr usize cnt = 20000;
+    constexpr usize cnt = 60000;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
