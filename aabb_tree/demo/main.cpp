@@ -75,7 +75,7 @@ int main(void) {
         aabb_vecs[i].y = sin(angle) * speed;
     }
 
-    // Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
+    Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
     SetTargetFPS(6736);
     while (!WindowShouldClose()) {
@@ -91,28 +91,29 @@ int main(void) {
 
         aabbtree::update(&tree);
         auto pair_list = aabbtree::get_collided_pairs(&tree);
+        // auto pair_list = AABBPairList{};
 
-        // std::vector<std::pair<AABB2f, usize>> debug_boxes;
-        // debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
+        std::vector<std::pair<AABB2f, usize>> debug_boxes;
+        debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // for (const auto &[aabb, depth] : debug_boxes) {
-        //     Color border_color = debug_box_color[depth % 7];
-        //     Color fill_color = border_color;
-        //     fill_color.a = 10;
-        //
-        //     f32 offset_scale = 0;
-        //     Rectangle rect = {
-        //         aabb.min.x - depth * offset_scale,
-        //         aabb.min.y - depth * offset_scale,
-        //         aabb.max.x - aabb.min.x + depth * offset_scale * 2,
-        //         aabb.max.y - aabb.min.y + depth * offset_scale * 2};
-        //
-        //     DrawRectangle(rect.x, rect.y, rect.width, rect.height,
-        //     fill_color); DrawRectangleLinesEx(rect, 1.0, border_color);
-        // }
+        for (const auto &[aabb, depth] : debug_boxes) {
+            Color border_color = debug_box_color[depth % 7];
+            Color fill_color = border_color;
+            fill_color.a = 10;
+
+            f32 offset_scale = 0;
+            Rectangle rect = {
+                aabb.min.x - depth * offset_scale,
+                aabb.min.y - depth * offset_scale,
+                aabb.max.x - aabb.min.x + depth * offset_scale * 2,
+                aabb.max.y - aabb.min.y + depth * offset_scale * 2};
+
+            DrawRectangle(rect.x, rect.y, rect.width, rect.height,
+            fill_color); DrawRectangleLinesEx(rect, 1.0, border_color);
+        }
 
         for (auto i = 0U; i < cnt; i++) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLUE);
@@ -129,6 +130,7 @@ int main(void) {
         }
         arrlist_free(&pair_list);
 
+        DrawRectangle(0, 0, 120, 40, WHITE);
         DrawFPS(10, 10);
 
         EndDrawing();

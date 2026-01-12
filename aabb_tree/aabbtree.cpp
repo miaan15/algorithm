@@ -1,4 +1,5 @@
-#include <cstdio>
+// TODO: Implement tree rotate for futher improvement
+
 #define ARRLIST_IMPLEMENTATION
 #include "arrlist.hpp"
 #include "define.hpp"
