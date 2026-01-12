@@ -59,7 +59,7 @@ int main(void) {
     InitWindow(1280, 720, "aabbtree demo");
     SetTargetFPS(60);
 
-    for (auto i = 0; i < cnt; i++) {
+    for (auto i = 0U; i < cnt; i++) {
         float minX = GetRandomValue(0 + 200, 1280 - 15 - 200);
         float minY = GetRandomValue(0 + 50, 720 - 15 - 50);
         float maxX = minX + GetRandomValue(5, 15);
@@ -68,22 +68,22 @@ int main(void) {
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
 
-        aabbtree_insert(&tree, &aabbs[i]);
+        aabbtree::insert(&tree, &aabbs[i]);
     }
 
-    for (auto i = 0; i < cnt; i++) {
+    for (auto i = 0U; i < cnt; i++) {
         float speed = GetRandomValue(80, 200);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
     }
 
-    Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
+    // Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
-        for (auto i = 0; i < cnt; i++) {
+        for (auto i = 0U; i < cnt; i++) {
             Vec2f displacement = aabb_vecs[i] * dt;
             aabbs[i].min += displacement;
             aabbs[i].max += displacement;
@@ -91,10 +91,10 @@ int main(void) {
             handle_aabb_hit_bounds(&aabbs[i], &aabb_vecs[i], 1280, 720);
         }
 
-        aabbtree_update(&tree);
-        auto pair_list = aabbtree_all_collide_pair(&tree);
+        aabbtree::update(&tree);
+        auto pair_list = aabbtree::get_collided_pairs(&tree);
 
-        std::vector<std::pair<AABB2f, usize>> debug_boxes;
+        // std::vector<std::pair<AABB2f, usize>> debug_boxes;
         // debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
 
         BeginDrawing();
@@ -116,7 +116,7 @@ int main(void) {
         //     fill_color); DrawRectangleLinesEx(rect, 1.0, border_color);
         // }
 
-        for (auto i = 0; i < cnt; i++) {
+        for (auto i = 0U; i < cnt; i++) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
                           aabbs[i].max.x - aabbs[i].min.x,
                           aabbs[i].max.y - aabbs[i].min.y, BLUE);

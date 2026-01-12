@@ -8,18 +8,29 @@
 
 namespace mia {
 
-struct AABBTree_Node;
+struct AABBTree_Node {
+    AABBTree_Node *parent;
+    AABBTree_Node *childs[2];
 
-struct AABBTree;
+    AABB2f bound;
+    AABB2f *data;
+};
+
+struct AABBTree {
+    AABBTree_Node *root;
+    f32 margin;
+};
 
 struct AABBPair {
     AABB2f *first, *second;
 };
 using AABBPairList = ArrList<AABBPair>;
 
-void aabbtree_insert(AABBTree *tree, AABB2f *aabb);
-void aabbtree_update(AABBTree *tree);
-AABBPairList aabbtree_all_collide_pair(AABBTree *tree);
+namespace aabbtree {
+void insert(AABBTree *tree, AABB2f *aabb);
+void update(AABBTree *tree);
+[[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList;
+} // namespace aabbtree
 
 } // namespace mia
 
