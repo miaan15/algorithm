@@ -40,7 +40,9 @@ struct _private::FitNodeValue {
 
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb);
+
 void update(AABBTree *tree);
+
 [[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList;
 } // namespace aabbtree
 

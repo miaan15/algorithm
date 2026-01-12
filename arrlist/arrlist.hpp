@@ -6,28 +6,34 @@
 namespace mia {
 
 template <typename T>
-struct ArrList;
+struct ArrList {
+    usize count;
+    usize capacity;
+    T *buffer;
+};
+
+namespace arrlist {
+template <typename T>
+void reserve(ArrList<T> *arrlist, usize new_capacity);
 
 template <typename T>
-void arrlist_reserve(ArrList<T> *arrlist, usize new_capacity);
+void append(ArrList<T> *arrlist, const T *value);
 
 template <typename T>
-void arrlist_append(ArrList<T> *arrlist, const T *value);
+void insert(ArrList<T> *arrlist, usize index, const T *value);
 
 template <typename T>
-void arrlist_insert(ArrList<T> *arrlist, usize index, const T *value);
+void pop(ArrList<T> *arrlist);
 
 template <typename T>
-void arrlist_pop(ArrList<T> *arrlist);
+void clear(ArrList<T> *arrlist);
 
 template <typename T>
-void arrlist_clear(ArrList<T> *arrlist);
+void trim(ArrList<T> *arrlist);
 
 template <typename T>
-void arrlist_trim(ArrList<T> *arrlist);
-
-template <typename T>
-void arrlist_free(ArrList<T> *arrlist);
+void free(ArrList<T> *arrlist);
+} // namespace arrlist
 
 } // namespace mia
 

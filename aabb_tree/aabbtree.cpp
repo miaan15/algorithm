@@ -42,8 +42,6 @@ struct _private::FitNodeValue {
 };
 #endif
 
-// =========================================================
-
 namespace _private {
 [[nodiscard]] auto is_node_leaf(const Node &node) -> bool;
 void find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f &bound, Node *cur, Node **cur_link, f32 accumulate_delta);
@@ -54,7 +52,6 @@ void uncheck_all_node_flag_helper(Node *node);
 void handle_self_collide_pair(Node *node, AABBPairList *list);
 } // namespace _private
 
-// =========================================================
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb) {
     if (tree->root == nullptr) {
@@ -116,7 +113,7 @@ void update(AABBTree *tree) {
         insert_node_from_old(tree, node);
     }
 
-    arrlist_free(&invalid_nodes);
+    arrlist::free(&invalid_nodes);
 }
 
 [[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList {
@@ -190,7 +187,7 @@ void _private::insert_node_from_old(AABBTree *tree, Node *node) {
 void _private::update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur) {
     if (is_node_leaf(*cur)) {
         if (!aabb_contains(cur->bound, *cur->data)) {
-            arrlist_append(invalid_list, cur);
+            arrlist::append(invalid_list, cur);
         }
     } else {
         update_invalid_nodes_helper(invalid_list, cur->childs[0]);
@@ -217,7 +214,7 @@ void _private::uncheck_all_node_flag_helper(Node *node) {
 void _private::get_collided_pairs_helper(AABBPairList *list, Node *node0, Node *node1) {
     if (is_node_leaf(*node0) && is_node_leaf(*node1)) {
         if (aabb_intersects(*node0->data, *node1->data)) {
-            arrlist_append(list, {node0->data, node1->data});
+            arrlist::append(list, {node0->data, node1->data});
         }
         return;
     }

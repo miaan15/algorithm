@@ -128,7 +128,7 @@ int main(void) {
             DrawRectangle(pair.second->min.x, pair.second->min.y, pair.second->max.x - pair.second->min.x,
                           pair.second->max.y - pair.second->min.y, color);
         }
-        arrlist_free(&pair_list);
+        arrlist::free(&pair_list);
 
         DrawRectangle(0, 0, 120, 40, WHITE);
         DrawFPS(10, 10);
