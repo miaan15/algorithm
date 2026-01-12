@@ -5,19 +5,27 @@
 
 namespace mia {
 
-struct ArenaRegion;
+struct ArenaRegion {
+    ArenaRegion *next;
+    usize count;
+    usize capacity;
+    uptr buffer[];
+};
 
-struct Arena;
+struct Arena {
+    ArenaRegion *begin, *end;
+};
 
-void *arena_alloc(Arena *arena, usize size_bytes);
-void *arena_realloc(Arena *arena, const void *old_ptr, usize old_size_bytes,
-                    usize new_size_bytes);
-void arena_free(Arena *arena);
-void arena_reset(Arena *arena);
-void arena_trim_excessed(Arena *arena);
+namespace arena {
+void *alloc(Arena *arena, usize size_bytes);
+void *realloc(Arena *arena, const void *old_ptr, usize old_size_bytes, usize new_size_bytes);
+void free(Arena *arena);
+void reset(Arena *arena);
+void trim_excessed(Arena *arena);
+} // namespace arena
 
 } // namespace mia
-  
+
 #ifdef ARENA_IMPLEMENTATION
 #include "arena.cpp"
 #endif
