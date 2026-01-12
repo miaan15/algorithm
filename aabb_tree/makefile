@@ -7,12 +7,12 @@ INCLUDES = -I.
 
 DEMO_TARGET = $(BUILD_DIR)/demo
 
-LDFLAGS = ./vendor/raylib/src/libraylib.a
+LIBS = ../vendor/raylib/src/libraylib.a
 
 all: $(DEMO_TARGET)
 
 $(DEMO_TARGET): ./demo/main.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ $(LIBS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
