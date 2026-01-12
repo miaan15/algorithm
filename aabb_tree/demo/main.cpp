@@ -50,9 +50,9 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 1.0;
+    tree.margin = 2.0;
 
-    constexpr usize cnt = 6700;
+    constexpr usize cnt = 20000;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
@@ -60,10 +60,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 200, 1280 - 15 - 200);
-        float minY = GetRandomValue(0 + 50, 720 - 15 - 50);
-        float maxX = minX + GetRandomValue(5, 15);
-        float maxY = minY + GetRandomValue(5, 15);
+        float minX = GetRandomValue(0 + 3, 1280 - 3 - 3);
+        float minY = GetRandomValue(0 + 3, 720 - 3 - 3);
+        float maxX = minX + GetRandomValue(1, 3);
+        float maxY = minY + GetRandomValue(1, 3);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -72,7 +72,7 @@ int main(void) {
     }
 
     for (auto i = 0U; i < cnt; i++) {
-        float speed = GetRandomValue(80, 200);
+        float speed = GetRandomValue(0, 30);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
@@ -127,7 +127,7 @@ int main(void) {
 
         for (cauto &pair : pair_list) {
             Color color = RED;
-            color.a = 64;
+            color.a = 200;
             DrawRectangle(pair.first->min.x, pair.first->min.y,
                           pair.first->max.x - pair.first->min.x,
                           pair.first->max.y - pair.first->min.y, color);
