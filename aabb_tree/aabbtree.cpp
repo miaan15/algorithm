@@ -3,8 +3,6 @@
 #include "define.hpp"
 #include "math.hpp"
 
-#include <unordered_set> // TODO: idk
-
 namespace mia {
 
 #ifndef AABBTREE_IMPLEMENTATION
@@ -14,6 +12,8 @@ struct AABBTree_Node {
 
     AABB2f bound;
     AABB2f *data;
+
+    bool is_self_check;
 };
 
 struct AABBTree {
@@ -33,9 +33,9 @@ namespace _ {
 [[nodiscard]] auto is_node_leaf(const AABBTree_Node &node) -> bool;
 void insert_node_helper(AABBTree_Node *node, AABB2f *const aabb, AABBTree *tree, AABBTree_Node **cur_link);
 void update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur);
-void all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1,
-                             std::unordered_set<AABBTree_Node *> *checked_childs_set);
-void handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list, std::unordered_set<AABBTree_Node *> *checked_childs_set);
+void all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1);
+void uncheck_all_node_flag_helper(AABBTree_Node *node);
+void handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list);
 } // namespace _
 
 // =========================================================
@@ -91,8 +91,9 @@ void update(AABBTree *tree) {
     if (tree->root == nullptr) return res;
     if (_::is_node_leaf(*tree->root)) return res;
 
-    std::unordered_set<AABBTree_Node *> checked_childs_set{};
-    _::all_collide_pair_helper(&res, tree->root->childs[0], tree->root->childs[1], &checked_childs_set);
+    _::uncheck_all_node_flag_helper(tree->root);
+    _::all_collide_pair_helper(&res, tree->root->childs[0], tree->root->childs[1]);
+
     return res;
 }
 } // namespace aabbtree
@@ -143,16 +144,23 @@ void _::update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list, AABB
     }
 }
 
-void _::handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list,
-                                         std::unordered_set<AABBTree_Node *> *checked_childs_set) {
-    if (checked_childs_set->find(node) == checked_childs_set->end()) {
-        all_collide_pair_helper(list, node->childs[0], node->childs[1], checked_childs_set);
-        checked_childs_set->insert(node);
+void _::handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list) {
+    if (!node->is_self_check) {
+        all_collide_pair_helper(list, node->childs[0], node->childs[1]);
+        node->is_self_check = true;
     }
 }
 
-void _::all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1,
-                                        std::unordered_set<AABBTree_Node *> *checked_childs_set) {
+void _::uncheck_all_node_flag_helper(AABBTree_Node *node) {
+    node->is_self_check = false;
+
+    if (is_node_leaf(*node)) return;
+
+    uncheck_all_node_flag_helper(node->childs[0]);
+    uncheck_all_node_flag_helper(node->childs[1]);
+}
+
+void _::all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1) {
     if (is_node_leaf(*node0) && is_node_leaf(*node1)) {
         if (aabb_intersects(*node0->data, *node1->data)) {
             arrlist_append(list, {node0->data, node1->data});
@@ -161,37 +169,37 @@ void _::all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTr
     }
 
     if (!aabb_intersects(node0->bound, node1->bound)) {
-        if (!is_node_leaf(*node0)) handle_self_collide_pair(node0, list, checked_childs_set);
+        if (!is_node_leaf(*node0)) handle_self_collide_pair(node0, list);
 
-        if (!is_node_leaf(*node1)) handle_self_collide_pair(node1, list, checked_childs_set);
+        if (!is_node_leaf(*node1)) handle_self_collide_pair(node1, list);
 
         return;
     }
 
     if (is_node_leaf(*node0)) {
-        handle_self_collide_pair(node1, list, checked_childs_set);
+        handle_self_collide_pair(node1, list);
 
-        all_collide_pair_helper(list, node0, node1->childs[0], checked_childs_set);
-        all_collide_pair_helper(list, node0, node1->childs[1], checked_childs_set);
+        all_collide_pair_helper(list, node0, node1->childs[0]);
+        all_collide_pair_helper(list, node0, node1->childs[1]);
 
         return;
     }
     if (is_node_leaf(*node1)) {
-        handle_self_collide_pair(node0, list, checked_childs_set);
+        handle_self_collide_pair(node0, list);
 
-        all_collide_pair_helper(list, node0->childs[0], node1, checked_childs_set);
-        all_collide_pair_helper(list, node0->childs[1], node1, checked_childs_set);
+        all_collide_pair_helper(list, node0->childs[0], node1);
+        all_collide_pair_helper(list, node0->childs[1], node1);
 
         return;
     }
 
-    handle_self_collide_pair(node0, list, checked_childs_set);
-    handle_self_collide_pair(node1, list, checked_childs_set);
+    handle_self_collide_pair(node0, list);
+    handle_self_collide_pair(node1, list);
 
-    all_collide_pair_helper(list, node0->childs[0], node1->childs[0], checked_childs_set);
-    all_collide_pair_helper(list, node0->childs[0], node1->childs[1], checked_childs_set);
-    all_collide_pair_helper(list, node0->childs[1], node1->childs[0], checked_childs_set);
-    all_collide_pair_helper(list, node0->childs[1], node1->childs[1], checked_childs_set);
+    all_collide_pair_helper(list, node0->childs[0], node1->childs[0]);
+    all_collide_pair_helper(list, node0->childs[0], node1->childs[1]);
+    all_collide_pair_helper(list, node0->childs[1], node1->childs[0]);
+    all_collide_pair_helper(list, node0->childs[1], node1->childs[1]);
 }
 
 } // namespace mia

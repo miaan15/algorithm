@@ -14,6 +14,8 @@ struct AABBTree_Node {
 
     AABB2f bound;
     AABB2f *data;
+
+    bool is_self_check;
 };
 
 struct AABBTree {
