@@ -50,19 +50,20 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width,
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 10.0;
+    tree.margin = 20.0;
 
-    AABB2f aabbs[36];
-    Vec2f aabb_vecs[36];
+    constexpr usize cnt = 10;
+    AABB2f aabbs[cnt];
+    Vec2f aabb_vecs[cnt];
 
     InitWindow(1280, 720, "aabbtree demo");
     SetTargetFPS(60);
 
-    for (auto i = 0; i < 36; i++) {
-        float minX = GetRandomValue(0 + 100, 1280 - 20 - 100);
-        float minY = GetRandomValue(0 + 100, 720 - 20 - 100);
-        float maxX = minX + GetRandomValue(5, 20);
-        float maxY = minY + GetRandomValue(5, 20);
+    for (auto i = 0; i < cnt; i++) {
+        float minX = GetRandomValue(0 + 100, 1280 - 150 - 100);
+        float minY = GetRandomValue(0 + 100, 720 - 150 - 100);
+        float maxX = minX + GetRandomValue(80, 150);
+        float maxY = minY + GetRandomValue(80, 150);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -70,9 +71,8 @@ int main(void) {
         aabbtree_insert(&tree, &aabbs[i]);
     }
 
-    // Randomly generate initialize aabb's velocities
-    for (auto i = 0; i < 36; i++) {
-        float speed = GetRandomValue(50, 200);
+    for (auto i = 0; i < cnt; i++) {
+        float speed = GetRandomValue(10, 100);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
@@ -80,11 +80,10 @@ int main(void) {
 
     Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
-    usize r_idx = 0;
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
-        for (auto i = 0; i < 36; i++) {
+        for (auto i = 0; i < cnt; i++) {
             Vec2f displacement = aabb_vecs[i] * dt;
             aabbs[i].min += displacement;
             aabbs[i].max += displacement;
@@ -93,6 +92,7 @@ int main(void) {
         }
 
         aabbtree_update(&tree);
+        auto pair_list = aabbtree_all_collide_pair(&tree);
 
         std::vector<std::pair<AABB2f, usize>> debug_boxes;
         debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
@@ -116,7 +116,7 @@ int main(void) {
             DrawRectangleLinesEx(rect, 1.0, border_color);
         }
 
-        for (auto i = 0; i < 36; i++) {
+        for (auto i = 0; i < cnt; i++) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y,
                           aabbs[i].max.x - aabbs[i].min.x,
                           aabbs[i].max.y - aabbs[i].min.y, BLUE);
@@ -124,6 +124,18 @@ int main(void) {
                                aabbs[i].max.x - aabbs[i].min.x,
                                aabbs[i].max.y - aabbs[i].min.y, BLACK);
         }
+
+        for (cauto &pair : pair_list) {
+            Color color = RED;
+            color.a = 128;
+            DrawRectangle(pair.first->min.x, pair.first->min.y,
+                          pair.first->max.x - pair.first->min.x,
+                          pair.first->max.y - pair.first->min.y, color);
+            DrawRectangle(pair.second->min.x, pair.second->min.y,
+                          pair.second->max.x - pair.second->min.x,
+                          pair.second->max.y - pair.second->min.y, color);
+        }
+        arrlist_free(&pair_list);
 
         DrawFPS(10, 10);
 
