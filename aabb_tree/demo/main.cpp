@@ -7,7 +7,7 @@
 using namespace mia;
 
 void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes,
-                                  AABBTree_Node *cur_node, usize depth) {
+                                  _private::Node *cur_node, usize depth) {
     boxes->emplace_back(std::make_pair(cur_node->bound, depth));
 
     if (!cur_node->childs[0] || !cur_node->childs[1])

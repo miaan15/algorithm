@@ -5,19 +5,16 @@
 
 namespace mia {
 
+namespace _private {}
+using namespace _private;
+
 #ifndef AABBTREE_IMPLEMENTATION
-struct AABBTree_Node {
-    AABBTree_Node *parent;
-    AABBTree_Node *childs[2];
-
-    AABB2f bound;
-    AABB2f *data;
-
-    bool is_self_check;
-};
+namespace _private {
+struct Node;
+} // namespace _
 
 struct AABBTree {
-    AABBTree_Node *root;
+    Node *root;
     f32 margin;
 };
 
@@ -25,24 +22,34 @@ struct AABBPair {
     AABB2f *first, *second;
 };
 using AABBPairList = ArrList<AABBPair>;
+
+struct _private::Node {
+    Node *parent;
+    Node *childs[2];
+
+    AABB2f bound;
+    AABB2f *data;
+
+    bool is_self_check;
+};
 #endif
 
 // =========================================================
 
-namespace _ {
-[[nodiscard]] auto is_node_leaf(const AABBTree_Node &node) -> bool;
-void insert_node_helper(AABBTree_Node *node, AABB2f *const aabb, AABBTree *tree, AABBTree_Node **cur_link);
-void update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur);
-void all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1);
-void uncheck_all_node_flag_helper(AABBTree_Node *node);
-void handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list);
+namespace _private {
+[[nodiscard]] auto is_node_leaf(const Node &node) -> bool;
+void insert_node_helper(Node *node, AABB2f *const aabb, AABBTree *tree, Node **cur_link);
+void update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur);
+void all_collide_pair_helper(AABBPairList *list, Node *node0, Node *node1);
+void uncheck_all_node_flag_helper(Node *node);
+void handle_self_collide_pair(Node *node, AABBPairList *list);
 } // namespace _
 
 // =========================================================
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb) {
     if (tree->root == nullptr) {
-        auto node = new AABBTree_Node{};
+        auto node = new Node{};
         node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
         node->data = aabb;
 
@@ -51,13 +58,13 @@ void insert(AABBTree *tree, AABB2f *aabb) {
         return;
     }
 
-    _::insert_node_helper(new AABBTree_Node{}, aabb, tree, &tree->root);
+    insert_node_helper(new Node{}, aabb, tree, &tree->root);
 }
 
 void update(AABBTree *tree) {
     if (tree->root == nullptr) return;
 
-    if (_::is_node_leaf(*tree->root)) {
+    if (is_node_leaf(*tree->root)) {
         auto &root = tree->root;
         root->bound = {{root->data->min - (Vec2f){tree->margin, tree->margin}},
                        {root->data->max + (Vec2f){tree->margin, tree->margin}}};
@@ -65,8 +72,8 @@ void update(AABBTree *tree) {
         return;
     }
 
-    ArrList<AABBTree_Node *> invalid_nodes = {};
-    _::update_invalid_nodes_helper(&invalid_nodes, tree->root);
+    ArrList<Node *> invalid_nodes = {};
+    update_invalid_nodes_helper(&invalid_nodes, tree->root);
 
     for (auto node : invalid_nodes) {
         cauto parent = node->parent;
@@ -79,7 +86,7 @@ void update(AABBTree *tree) {
         *parent_link = sibling;
         delete parent;
 
-        _::insert_node_helper(node, node->data, tree, &tree->root);
+        insert_node_helper(node, node->data, tree, &tree->root);
     }
 
     arrlist_free(&invalid_nodes);
@@ -89,26 +96,26 @@ void update(AABBTree *tree) {
     AABBPairList res{};
 
     if (tree->root == nullptr) return res;
-    if (_::is_node_leaf(*tree->root)) return res;
+    if (is_node_leaf(*tree->root)) return res;
 
-    _::uncheck_all_node_flag_helper(tree->root);
-    _::all_collide_pair_helper(&res, tree->root->childs[0], tree->root->childs[1]);
+    uncheck_all_node_flag_helper(tree->root);
+    all_collide_pair_helper(&res, tree->root->childs[0], tree->root->childs[1]);
 
     return res;
 }
 } // namespace aabbtree
 
-[[nodiscard]] auto _::is_node_leaf(const AABBTree_Node &node) -> bool {
+[[nodiscard]] auto _private::is_node_leaf(const Node &node) -> bool {
     return node.childs[0] == nullptr && node.childs[1] == nullptr;
 }
 
-void _::insert_node_helper(AABBTree_Node *node, AABB2f *const aabb, AABBTree *tree, AABBTree_Node **cur_link) {
+void _private::insert_node_helper(Node *node, AABB2f *const aabb, AABBTree *tree, Node **cur_link) {
     auto cur = *cur_link;
     if (is_node_leaf(*cur)) {
         node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
         node->data = aabb;
 
-        auto new_parent = new AABBTree_Node{};
+        auto new_parent = new Node{};
         new_parent->bound = aabb_merge(cur->bound, node->bound);
 
         new_parent->parent = cur->parent;
@@ -133,7 +140,7 @@ void _::insert_node_helper(AABBTree_Node *node, AABB2f *const aabb, AABBTree *tr
     cur->bound = aabb_merge(cur->childs[0]->bound, cur->childs[1]->bound);
 }
 
-void _::update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list, AABBTree_Node *cur) {
+void _private::update_invalid_nodes_helper(ArrList<Node *> *invalid_list, Node *cur) {
     if (is_node_leaf(*cur)) {
         if (!aabb_contains(cur->bound, *cur->data)) {
             arrlist_append(invalid_list, cur);
@@ -144,14 +151,14 @@ void _::update_invalid_nodes_helper(ArrList<AABBTree_Node *> *invalid_list, AABB
     }
 }
 
-void _::handle_self_collide_pair(AABBTree_Node *node, AABBPairList *list) {
+void _private::handle_self_collide_pair(Node *node, AABBPairList *list) {
     if (!node->is_self_check) {
         all_collide_pair_helper(list, node->childs[0], node->childs[1]);
         node->is_self_check = true;
     }
 }
 
-void _::uncheck_all_node_flag_helper(AABBTree_Node *node) {
+void _private::uncheck_all_node_flag_helper(Node *node) {
     node->is_self_check = false;
 
     if (is_node_leaf(*node)) return;
@@ -160,7 +167,7 @@ void _::uncheck_all_node_flag_helper(AABBTree_Node *node) {
     uncheck_all_node_flag_helper(node->childs[1]);
 }
 
-void _::all_collide_pair_helper(AABBPairList *list, AABBTree_Node *node0, AABBTree_Node *node1) {
+void _private::all_collide_pair_helper(AABBPairList *list, Node *node0, Node *node1) {
     if (is_node_leaf(*node0) && is_node_leaf(*node1)) {
         if (aabb_intersects(*node0->data, *node1->data)) {
             arrlist_append(list, {node0->data, node1->data});
