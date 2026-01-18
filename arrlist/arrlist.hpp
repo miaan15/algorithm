@@ -19,10 +19,10 @@ template <typename T>
 void reserve(ArrList<T> *arrlist, usize new_capacity);
 
 template <typename T>
-void append(ArrList<T> *arrlist, const T *value);
+void append(ArrList<T> *arrlist, const T &value);
 
 template <typename T>
-void insert(ArrList<T> *arrlist, usize index, const T *value);
+void insert(ArrList<T> *arrlist, usize index, const T &value);
 
 template <typename T>
 void pop(ArrList<T> *arrlist);
@@ -35,12 +35,6 @@ void trim(ArrList<T> *arrlist);
 
 template <typename T>
 void free(ArrList<T> *arrlist);
-
-template <typename T>
-T *at(ArrList<T> *arrlist, usize index);
-
-template <typename T>
-const T *at(const ArrList<T> *arrlist, usize index);
 } // namespace arrlist
 
 } // namespace mia
