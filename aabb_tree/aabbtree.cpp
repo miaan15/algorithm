@@ -264,7 +264,7 @@ auto _handle_remove_helper(AABBTree *tree, AABB2f *aabb, AABBTreeNode *cur, AABB
             *cur_link = cur->childs[0];
             cur->childs[0]->parent = cur->parent;
             free(cur);
-            free(cur->childs[0]);
+            // free(cur->childs[0]);
             return true;
         }
     }
@@ -278,7 +278,7 @@ auto _handle_remove_helper(AABBTree *tree, AABB2f *aabb, AABBTreeNode *cur, AABB
             *cur_link = cur->childs[1];
             cur->childs[1]->parent = cur->parent;
             free(cur);
-            free(cur->childs[1]);
+            // free(cur->childs[1]);
             return true;
         }
     }
