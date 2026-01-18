@@ -2,7 +2,8 @@
 #include "../aabbtree.hpp"
 
 #include "raylib.h"
-#include <set>
+#include <iterator>
+#include <unordered_set>
 #include <vector>
 
 using namespace mia;
@@ -49,10 +50,10 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width, f
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 7.0;
+    tree.margin = 2.0;
 
-    constexpr usize cnt = 8;
-    std::set<usize> removed_indices;
+    constexpr usize cnt = 5000;
+    std::unordered_set<usize> removed_indices;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
@@ -60,10 +61,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 1, 1600 - 300 - 1);
-        float minY = GetRandomValue(0 + 1, 900 - 300 - 1);
-        float maxX = minX + GetRandomValue(50, 300);
-        float maxY = minY + GetRandomValue(50, 300);
+        float minX = GetRandomValue(0 + 1, 1600 - 8 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 8 - 1);
+        float maxX = minX + GetRandomValue(3, 8);
+        float maxY = minY + GetRandomValue(3, 8);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -72,7 +73,7 @@ int main(void) {
     }
 
     for (auto i = 0U; i < cnt; i++) {
-        float speed = GetRandomValue(0, 0);
+        float speed = GetRandomValue(0, 10);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
@@ -80,9 +81,15 @@ int main(void) {
 
     Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
-    SetTargetFPS(6736);
+    SetTargetFPS(60);
+
+    usize frame_count = 0;
+    bool remove_mode = true; // true: remove each frame, insert each 6 frames
+                             // false: remove each 6 frames, insert each frame
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
+        frame_count++;
 
         std::vector<usize> active_indices;
         for (usize i = 0; i < cnt; i++) {
@@ -91,19 +98,49 @@ int main(void) {
             }
         }
 
-        if (IsKeyPressed(KEY_D)) {
-            if (!active_indices.empty()) {
+        // Reverse mode if no active AABBs or all are active
+        if (active_indices.empty() && remove_mode) {
+            remove_mode = false;
+        } else if (removed_indices.empty() && !remove_mode) {
+            remove_mode = true;
+        }
+
+        // Remove or insert based on mode and frame count
+        if (remove_mode) {
+            // Remove each frame, insert each 6 frames
+            if (!active_indices.empty() && frame_count % 1 == 0) {
+                for (auto _ = 0; _ < 6; _++) {
+                    usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
+                    aabbtree::remove(&tree, &aabbs[random_idx]);
+                    removed_indices.insert(random_idx);
+                }
+            }
+            if (!removed_indices.empty() && frame_count % 36 == 0) {
+                auto it = removed_indices.begin();
+                if (it == nullptr) continue;
+                std::advance(it, GetRandomValue(0, removed_indices.size() - 1));
+                if (it == nullptr) continue;
+                usize idx = *it;
+                aabbtree::insert(&tree, &aabbs[idx]);
+                removed_indices.erase(it);
+            }
+        } else {
+            // Remove each 6 frames, insert each frame
+            if (!active_indices.empty() && frame_count % 36 == 0) {
                 usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
                 aabbtree::remove(&tree, &aabbs[random_idx]);
                 removed_indices.insert(random_idx);
             }
-        }
-
-        if (IsKeyPressed(KEY_A)) {
-            if (!removed_indices.empty()) {
-                usize idx = *removed_indices.begin();
-                aabbtree::insert(&tree, &aabbs[idx]);
-                removed_indices.erase(removed_indices.begin());
+            if (!removed_indices.empty() && frame_count % 1 == 0) {
+                for (auto _ = 0; _ < 12; _++) {
+                    auto it = removed_indices.begin();
+                    if (it == nullptr) continue;
+                    std::advance(it, GetRandomValue(0, removed_indices.size() - 1));
+                    if (it == nullptr) continue;
+                    usize idx = *it;
+                    aabbtree::insert(&tree, &aabbs[idx]);
+                    removed_indices.erase(it);
+                }
             }
         }
 
@@ -130,7 +167,7 @@ int main(void) {
             Color fill_color = border_color;
             fill_color.a = 10;
 
-            f32 offset_scale = 2;
+            f32 offset_scale = 0;
             Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
                               aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
 

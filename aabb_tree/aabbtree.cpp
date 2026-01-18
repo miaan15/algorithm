@@ -78,6 +78,12 @@ void insert(AABBTree *tree, AABB2f *aabb) {
     node->parent = new_parent;
 
     *best.link = new_parent;
+
+    auto cur_update_node = new_parent->parent;
+    while (cur_update_node != nullptr) {
+        cur_update_node->bound = aabb::merge(cur_update_node->childs[0]->bound, cur_update_node->childs[1]->bound);
+        cur_update_node = cur_update_node->parent;
+    }
 }
 
 auto remove(AABBTree *tree, AABB2f *aabb) -> bool {
@@ -159,10 +165,9 @@ void _find_best_fit_node_insert_helper(FitNodeValue *best, const AABB2f &bound, 
 }
 
 void _insert_node_from_old(AABBTree *tree, AABBTreeNode *node) {
-    cauto &aabb = node->data;
+    cauto aabb = node->data;
     if (tree->root == nullptr) {
         node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-        node->data = aabb;
 
         tree->root = node;
 
@@ -170,11 +175,10 @@ void _insert_node_from_old(AABBTree *tree, AABBTreeNode *node) {
     }
 
     cauto fat_bound = (AABB2f){{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-    auto best = (FitNodeValue){.node = tree->root, .link = nullptr, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
-    _find_best_fit_node_insert_helper(&best, fat_bound, tree->root, nullptr, 0);
+    auto best = (FitNodeValue){.node = tree->root, .link = &tree->root, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
+    _find_best_fit_node_insert_helper(&best, fat_bound, tree->root, &tree->root, 0);
 
-    node->bound = {{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-    node->data = aabb;
+    node->bound = fat_bound;
 
     auto new_parent = new AABBTreeNode{};
     new_parent->bound = aabb::merge(best.node->bound, node->bound);
@@ -188,6 +192,12 @@ void _insert_node_from_old(AABBTree *tree, AABBTreeNode *node) {
 
     if (best.link != nullptr) {
         *best.link = new_parent;
+    }
+
+    auto cur_update_node = new_parent->parent;
+    while (cur_update_node != nullptr) {
+        cur_update_node->bound = aabb::merge(cur_update_node->childs[0]->bound, cur_update_node->childs[1]->bound);
+        cur_update_node = cur_update_node->parent;
     }
 }
 
