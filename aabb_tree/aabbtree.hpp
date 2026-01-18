@@ -5,6 +5,7 @@
 #include "arrlist.hpp"
 #include "define.hpp"
 #include "math.hpp"
+#include "pool.hpp"
 
 namespace mia {
 
@@ -13,13 +14,15 @@ struct AABBTreeNode {
     AABBTreeNode *childs[2];
 
     AABB2f bound;
-    AABB2f *data;
+    usize index;
 
     bool is_self_check;
 };
 struct AABBTree {
     AABBTreeNode *root;
     f32 margin;
+
+    Pool<AABB2f> data;
 };
 
 struct AABBPair {
@@ -28,7 +31,7 @@ struct AABBPair {
 using AABBPairList = ArrList<AABBPair>;
 
 namespace aabbtree {
-void insert(AABBTree *tree, AABB2f *aabb);
+void insert(AABBTree *tree, const AABB2f &aabb);
 
 void update(AABBTree *tree);
 

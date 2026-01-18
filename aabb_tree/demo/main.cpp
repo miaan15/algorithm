@@ -6,7 +6,7 @@
 
 using namespace mia;
 
-void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, _private::Node *cur_node, usize depth) {
+void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, AABBTreeNode *cur_node, usize depth) {
     boxes->emplace_back(std::make_pair(cur_node->bound, depth));
 
     if (!cur_node->childs[0] || !cur_node->childs[1]) return;
@@ -49,7 +49,7 @@ int main(void) {
     AABBTree tree{};
     tree.margin = 7.0;
 
-    constexpr usize cnt = 10000;
+    constexpr usize cnt = 100;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
@@ -57,15 +57,15 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 1, 1600 - 8 - 1);
-        float minY = GetRandomValue(0 + 1, 900 - 8 - 1);
-        float maxX = minX + GetRandomValue(2, 8);
-        float maxY = minY + GetRandomValue(2, 8);
+        float minX = GetRandomValue(0 + 1, 1600 - 50 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 50 - 1);
+        float maxX = minX + GetRandomValue(10, 50);
+        float maxY = minY + GetRandomValue(10, 50);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
 
-        aabbtree::insert(&tree, &aabbs[i]);
+        aabbtree::insert(&tree, aabbs[i]);
     }
 
     for (auto i = 0U; i < cnt; i++) {
