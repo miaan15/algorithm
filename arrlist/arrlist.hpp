@@ -10,6 +10,8 @@ struct ArrList {
     usize count;
     usize capacity;
     T *buffer;
+
+    T &operator[](usize index);
 };
 
 namespace arrlist {
@@ -33,6 +35,12 @@ void trim(ArrList<T> *arrlist);
 
 template <typename T>
 void free(ArrList<T> *arrlist);
+
+template <typename T>
+T *at(ArrList<T> *arrlist, usize index);
+
+template <typename T>
+const T *at(const ArrList<T> *arrlist, usize index);
 } // namespace arrlist
 
 } // namespace mia

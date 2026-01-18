@@ -14,6 +14,10 @@ struct ArrList {
     usize count;
     usize capacity;
     T *buffer;
+
+    T &operator[](usize index) {
+        return this->buffer[index];
+    }
 };
 #endif
 
@@ -26,19 +30,19 @@ T *end(ArrList<T> &arrlist) {
     return arrlist.buffer + arrlist.count;
 }
 template <typename T>
-const T *begin(ArrList<T> const &arrlist) {
+const T *begin(const ArrList<T> &arrlist) {
     return arrlist.buffer;
 }
 template <typename T>
-const T *end(ArrList<T> const &arrlist) {
+const T *end(const ArrList<T> &arrlist) {
     return arrlist.buffer + arrlist.count;
 }
 template <typename T>
-const T *cbegin(ArrList<T> const &arrlist) {
+const T *cbegin(const ArrList<T> &arrlist) {
     return arrlist.buffer;
 }
 template <typename T>
-const T *cend(ArrList<T> const &arrlist) {
+const T *cend(const ArrList<T> &arrlist) {
     return arrlist.buffer + arrlist.count;
 }
 
@@ -112,6 +116,16 @@ void free(ArrList<T> *arrlist) {
     arrlist->buffer = nullptr;
     arrlist->count = 0;
     arrlist->capacity = 0;
+}
+
+template <typename T>
+T *at(ArrList<T> *arrlist, usize index) {
+    return &arrlist->buffer[index];
+}
+
+template <typename T>
+const T *at(const ArrList<T> *arrlist, usize index) {
+    return &arrlist->buffer[index];
 }
 } // namespace arrlist
 
