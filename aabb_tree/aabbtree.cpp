@@ -7,8 +7,6 @@
 #include "math.hpp"
 #include "pool.hpp"
 
-#include <vector>
-
 namespace mia {
 
 #ifndef AABBTREE_HPP
@@ -46,6 +44,7 @@ void _update_invalid_nodes_helper(ArrList<AABBTreeNode *> *invalid_list, AABBTre
 void _get_collided_pairs_helper(AABBPairList *list, AABBTreeNode *node0, AABBTreeNode *node1);
 void _uncheck_all_node_flag_helper(AABBTreeNode *node);
 void _handle_self_collide_pair(AABBTreeNode *node, AABBPairList *list);
+auto _handle_remove_helper(AABBTree *tree, AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_link) -> bool;
 
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb) {
@@ -79,6 +78,11 @@ void insert(AABBTree *tree, AABB2f *aabb) {
     node->parent = new_parent;
 
     *best.link = new_parent;
+}
+
+void remove(AABBTree *tree, AABB2f *aabb) {
+    if (tree->root == nullptr) return;
+    _handle_remove_helper(tree, aabb, tree->root, &tree->root);
 }
 
 void update(AABBTree *tree) {
@@ -247,6 +251,43 @@ void _get_collided_pairs_helper(AABBPairList *list, AABBTreeNode *node0, AABBTre
     _get_collided_pairs_helper(list, node0->childs[0], node1->childs[1]);
     _get_collided_pairs_helper(list, node0->childs[1], node1->childs[0]);
     _get_collided_pairs_helper(list, node0->childs[1], node1->childs[1]);
+}
+
+auto _handle_remove_helper(AABBTree *tree, AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_link) -> bool {
+    bool res = false;
+    if (!_is_node_leaf(*cur->childs[0])) {
+        if (aabb::contains(cur->childs[0]->bound, *aabb)) {
+            res |= _handle_remove_helper(tree, aabb, cur->childs[0], &cur->childs[0]);
+        }
+    } else {
+        if (cur->childs[0]->data == aabb) {
+            *cur_link = cur->childs[0];
+            cur->childs[0]->parent = cur->parent;
+            free(cur);
+            free(cur->childs[0]);
+            return true;
+        }
+    }
+
+    if (!_is_node_leaf(*cur->childs[1])) {
+        if (aabb::contains(cur->childs[1]->bound, *aabb)) {
+            res |= _handle_remove_helper(tree, aabb, cur->childs[1], &cur->childs[1]);
+        }
+    } else {
+        if (cur->childs[1]->data == aabb) {
+            *cur_link = cur->childs[1];
+            cur->childs[1]->parent = cur->parent;
+            free(cur);
+            free(cur->childs[1]);
+            return true;
+        }
+    }
+
+    if (res) {
+        cur->bound = aabb::merge(cur->childs[0]->bound, cur->childs[1]->bound);
+    }
+
+    return res;
 }
 
 } // namespace mia

@@ -6,7 +6,7 @@
 
 using namespace mia;
 
-void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, _private::Node *cur_node, usize depth) {
+void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, AABBTreeNode *cur_node, usize depth) {
     boxes->emplace_back(std::make_pair(cur_node->bound, depth));
 
     if (!cur_node->childs[0] || !cur_node->childs[1]) return;
@@ -105,14 +105,11 @@ int main(void) {
             fill_color.a = 10;
 
             f32 offset_scale = 0;
-            Rectangle rect = {
-                aabb.min.x - depth * offset_scale,
-                aabb.min.y - depth * offset_scale,
-                aabb.max.x - aabb.min.x + depth * offset_scale * 2,
-                aabb.max.y - aabb.min.y + depth * offset_scale * 2};
+            Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
+                              aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
 
-            DrawRectangle(rect.x, rect.y, rect.width, rect.height,
-            fill_color); DrawRectangleLinesEx(rect, 1.0, border_color);
+            DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
+            DrawRectangleLinesEx(rect, 1.0, border_color);
         }
 
         for (auto i = 0U; i < cnt; i++) {
