@@ -5,8 +5,8 @@
 
 namespace mia {
 
-namespace _private {}
-using namespace _private;
+namespace _arrlist {}
+using namespace _arrlist;
 
 #ifndef ARRLIST_IMPLEMENTATION
 template <typename T>
@@ -46,10 +46,10 @@ const T *cend(const ArrList<T> &arrlist) {
     return arrlist.buffer + arrlist.count;
 }
 
-namespace _private {
+namespace _arrlist {
 template <typename T>
 void handle_capacity_extend(ArrList<T> *arrlist, usize size_increase);
-} // namespace _private
+} // namespace _arrlist
 
 namespace arrlist {
 template <typename T>
@@ -120,7 +120,7 @@ void free(ArrList<T> *arrlist) {
 } // namespace arrlist
 
 template <typename T>
-void _private::handle_capacity_extend(ArrList<T> *arrlist, usize size_increase) {
+void _arrlist::handle_capacity_extend(ArrList<T> *arrlist, usize size_increase) {
     if (arrlist->count + size_increase > arrlist->capacity) {
         usize new_capacity = arrlist->capacity < 3 ? 3 : arrlist->capacity + (arrlist->capacity >> 1);
 

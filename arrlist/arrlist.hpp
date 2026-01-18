@@ -11,8 +11,23 @@ struct ArrList {
     usize capacity;
     T *buffer;
 
-    T &operator[](usize index);
+    T &operator[](usize index) {
+        return this->buffer[index];
+    }
 };
+
+template <typename T>
+T *begin(ArrList<T> &arrlist);
+template <typename T>
+T *end(ArrList<T> &arrlist);
+template <typename T>
+const T *begin(const ArrList<T> &arrlist);
+template <typename T>
+const T *end(const ArrList<T> &arrlist);
+template <typename T>
+const T *cbegin(const ArrList<T> &arrlist);
+template <typename T>
+const T *cend(const ArrList<T> &arrlist);
 
 namespace arrlist {
 template <typename T>
