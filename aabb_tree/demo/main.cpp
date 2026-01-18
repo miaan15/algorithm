@@ -50,9 +50,9 @@ void handle_aabb_hit_bounds(AABB2f *aabb, Vec2f *velocity, float screen_width, f
 
 int main(void) {
     AABBTree tree{};
-    tree.margin = 2.0;
+    tree.margin = 8.0;
 
-    constexpr usize cnt = 5000;
+    constexpr usize cnt = 10000;
     std::unordered_set<usize> removed_indices;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
@@ -61,10 +61,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 1, 1600 - 8 - 1);
-        float minY = GetRandomValue(0 + 1, 900 - 8 - 1);
-        float maxX = minX + GetRandomValue(3, 8);
-        float maxY = minY + GetRandomValue(3, 8);
+        float minX = GetRandomValue(0 + 1, 1600 - 10 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 10 - 1);
+        float maxX = minX + GetRandomValue(3, 10);
+        float maxY = minY + GetRandomValue(3, 10);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -73,15 +73,15 @@ int main(void) {
     }
 
     for (auto i = 0U; i < cnt; i++) {
-        float speed = GetRandomValue(0, 10);
+        float speed = GetRandomValue(0, 30);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
     }
 
-    Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
+    // Color debug_box_color[7] = {PURPLE, PINK, RED, ORANGE, YELLOW, LIME, GREEN};
 
-    SetTargetFPS(60);
+    SetTargetFPS(144);
 
     usize frame_count = 0;
     bool remove_mode = true; // true: remove each frame, insert each 6 frames
@@ -109,13 +109,13 @@ int main(void) {
         if (remove_mode) {
             // Remove each frame, insert each 6 frames
             if (!active_indices.empty() && frame_count % 1 == 0) {
-                for (auto _ = 0; _ < 6; _++) {
+                for (auto _ = 0; _ < 1; _++) {
                     usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
                     aabbtree::remove(&tree, &aabbs[random_idx]);
                     removed_indices.insert(random_idx);
                 }
             }
-            if (!removed_indices.empty() && frame_count % 36 == 0) {
+            if (!removed_indices.empty() && frame_count % 2 == 0) {
                 auto it = removed_indices.begin();
                 if (it == nullptr) continue;
                 std::advance(it, GetRandomValue(0, removed_indices.size() - 1));
@@ -126,13 +126,13 @@ int main(void) {
             }
         } else {
             // Remove each 6 frames, insert each frame
-            if (!active_indices.empty() && frame_count % 36 == 0) {
+            if (!active_indices.empty() && frame_count % 2 == 0) {
                 usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
                 aabbtree::remove(&tree, &aabbs[random_idx]);
                 removed_indices.insert(random_idx);
             }
             if (!removed_indices.empty() && frame_count % 1 == 0) {
-                for (auto _ = 0; _ < 12; _++) {
+                for (auto _ = 0; _ < 1; _++) {
                     auto it = removed_indices.begin();
                     if (it == nullptr) continue;
                     std::advance(it, GetRandomValue(0, removed_indices.size() - 1));
@@ -156,24 +156,24 @@ int main(void) {
         auto pair_list = aabbtree::get_collided_pairs(&tree);
         // auto pair_list = AABBPairList{};
 
-        std::vector<std::pair<AABB2f, usize>> debug_boxes;
-        debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
+        // std::vector<std::pair<AABB2f, usize>> debug_boxes;
+        // debug_boxes_helper_recursive(&debug_boxes, tree.root, 0);
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        for (const auto &[aabb, depth] : debug_boxes) {
-            Color border_color = debug_box_color[depth % 7];
-            Color fill_color = border_color;
-            fill_color.a = 10;
-
-            f32 offset_scale = 0;
-            Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
-                              aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
-
-            DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
-            DrawRectangleLinesEx(rect, 1.0, border_color);
-        }
+        // for (const auto &[aabb, depth] : debug_boxes) {
+        //     Color border_color = debug_box_color[depth % 7];
+        //     Color fill_color = border_color;
+        //     fill_color.a = 10;
+        //
+        //     f32 offset_scale = 0;
+        //     Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
+        //                       aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
+        //
+        //     DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
+        //     DrawRectangleLinesEx(rect, 1.0, border_color);
+        // }
 
         for (auto i : active_indices) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLUE);

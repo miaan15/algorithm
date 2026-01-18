@@ -91,6 +91,7 @@ auto remove(AABBTree *tree, AABB2f *aabb) -> bool {
     if (_is_node_leaf(*tree->root)) {
         if (aabb == tree->root->data) {
             tree->root = nullptr;
+            free(tree->root);
             return true;
         }
         return false;
@@ -121,7 +122,7 @@ void update(AABBTree *tree) {
 
         sibling->parent = parent->parent ? parent->parent : nullptr;
         *parent_link = sibling;
-        delete parent;
+        free(parent);
 
         _insert_node_from_old(tree, node);
     }
@@ -280,8 +281,8 @@ auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_l
         if (cur->childs[0]->data == aabb) {
             *cur_link = cur->childs[1];
             cur->childs[1]->parent = cur->parent;
+            free(cur->childs[0]);
             free(cur);
-            // free(cur->childs[0]);
             return true;
         }
     }
@@ -294,8 +295,8 @@ auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_l
         if (cur->childs[1]->data == aabb) {
             *cur_link = cur->childs[0];
             cur->childs[0]->parent = cur->parent;
+            free(cur->childs[1]);
             free(cur);
-            // free(cur->childs[1]);
             return true;
         }
     }
