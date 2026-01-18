@@ -90,7 +90,7 @@ template <typename T>
 void reserve(Pool<T> *pool, usize new_capacity);
 
 template <typename T>
-void insert(Pool<T> *pool, const T &value);
+auto insert(Pool<T> *pool, const T &value) -> usize;
 
 template <typename T>
 void remove(Pool<T> *pool, usize index);

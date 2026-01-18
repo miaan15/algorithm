@@ -107,7 +107,7 @@ void reserve(Pool<T> *pool, usize new_capacity) {
 }
 
 template <typename T>
-void insert(Pool<T> *pool, const T &value) {
+auto insert(Pool<T> *pool, const T &value) -> usize {
     if (pool->head >= pool->max) handle_capacity_extend(pool, 1);
 
     cauto old_head = pool->head;
@@ -122,6 +122,8 @@ void insert(Pool<T> *pool, const T &value) {
     pool->buffer[old_head].data = value;
 
     pool->count++;
+
+    return old_head;
 }
 
 template <typename T>
