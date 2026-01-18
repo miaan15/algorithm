@@ -29,7 +29,7 @@ using AABBPairList = ArrList<AABBPair>;
 
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb);
-
+auto remove(AABBTree *tree, AABB2f *aabb) -> bool;
 void update(AABBTree *tree);
 
 [[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList;

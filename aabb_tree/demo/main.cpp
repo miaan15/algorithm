@@ -2,11 +2,13 @@
 #include "../aabbtree.hpp"
 
 #include "raylib.h"
+#include <set>
 #include <vector>
 
 using namespace mia;
 
 void debug_boxes_helper_recursive(std::vector<std::pair<AABB2f, usize>> *boxes, AABBTreeNode *cur_node, usize depth) {
+    if (cur_node == nullptr) return;
     boxes->emplace_back(std::make_pair(cur_node->bound, depth));
 
     if (!cur_node->childs[0] || !cur_node->childs[1]) return;
@@ -49,7 +51,8 @@ int main(void) {
     AABBTree tree{};
     tree.margin = 7.0;
 
-    constexpr usize cnt = 10000;
+    constexpr usize cnt = 8;
+    std::set<usize> removed_indices;
     AABB2f aabbs[cnt];
     Vec2f aabb_vecs[cnt];
 
@@ -57,10 +60,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 1, 1600 - 8 - 1);
-        float minY = GetRandomValue(0 + 1, 900 - 8 - 1);
-        float maxX = minX + GetRandomValue(2, 8);
-        float maxY = minY + GetRandomValue(2, 8);
+        float minX = GetRandomValue(0 + 1, 1600 - 300 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 300 - 1);
+        float maxX = minX + GetRandomValue(50, 300);
+        float maxY = minY + GetRandomValue(50, 300);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -69,7 +72,7 @@ int main(void) {
     }
 
     for (auto i = 0U; i < cnt; i++) {
-        float speed = GetRandomValue(0, 30);
+        float speed = GetRandomValue(0, 0);
         float angle = GetRandomValue(0, 360) * DEG2RAD;
         aabb_vecs[i].x = cos(angle) * speed;
         aabb_vecs[i].y = sin(angle) * speed;
@@ -80,6 +83,29 @@ int main(void) {
     SetTargetFPS(6736);
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
+
+        std::vector<usize> active_indices;
+        for (usize i = 0; i < cnt; i++) {
+            if (removed_indices.find(i) == removed_indices.end()) {
+                active_indices.push_back(i);
+            }
+        }
+
+        if (IsKeyPressed(KEY_D)) {
+            if (!active_indices.empty()) {
+                usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
+                aabbtree::remove(&tree, &aabbs[random_idx]);
+                removed_indices.insert(random_idx);
+            }
+        }
+
+        if (IsKeyPressed(KEY_A)) {
+            if (!removed_indices.empty()) {
+                usize idx = *removed_indices.begin();
+                aabbtree::insert(&tree, &aabbs[idx]);
+                removed_indices.erase(removed_indices.begin());
+            }
+        }
 
         for (auto i = 0U; i < cnt; i++) {
             Vec2f displacement = aabb_vecs[i] * dt;
@@ -104,7 +130,7 @@ int main(void) {
             Color fill_color = border_color;
             fill_color.a = 10;
 
-            f32 offset_scale = 0;
+            f32 offset_scale = 2;
             Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
                               aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
 
@@ -112,7 +138,7 @@ int main(void) {
             DrawRectangleLinesEx(rect, 1.0, border_color);
         }
 
-        for (auto i = 0U; i < cnt; i++) {
+        for (auto i : active_indices) {
             DrawRectangle(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLUE);
             DrawRectangleLines(aabbs[i].min.x, aabbs[i].min.y, aabbs[i].max.x - aabbs[i].min.x, aabbs[i].max.y - aabbs[i].min.y, BLACK);
         }
