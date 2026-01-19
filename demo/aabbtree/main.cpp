@@ -1,7 +1,7 @@
-#define AABBTREE_IMPLEMENTATION
-#include "../aabbtree.hpp"
+#include <aabbtree.hpp>
 
-#include "raylib.h"
+#include <raylib.h>
+
 #include <iterator>
 #include <unordered_set>
 #include <vector>
@@ -66,8 +66,8 @@ int main(void) {
         float maxX = minX + GetRandomValue(3, 20);
         float maxY = minY + GetRandomValue(3, 20);
 
-        aabbs[i].min = {minX, minY};
-        aabbs[i].max = {maxX, maxY};
+        aabbs[i].min = {{minX, minY}};
+        aabbs[i].max = {{maxX, maxY}};
 
         aabbtree::insert(&tree, &aabbs[i]);
     }
@@ -169,7 +169,8 @@ int main(void) {
         //
         //     f32 offset_scale = 0;
         //     Rectangle rect = {aabb.min.x - depth * offset_scale, aabb.min.y - depth * offset_scale,
-        //                       aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale * 2};
+        //                       aabb.max.x - aabb.min.x + depth * offset_scale * 2, aabb.max.y - aabb.min.y + depth * offset_scale *
+        //                       2};
         //
         //     DrawRectangle(rect.x, rect.y, rect.width, rect.height, fill_color);
         //     DrawRectangleLinesEx(rect, 1.0, border_color);
@@ -193,25 +194,19 @@ int main(void) {
         // Query AABB around cursor position and highlight detected AABBs
         Vector2 mouse_pos = GetMousePosition();
         constexpr float query_half_size = 50.0f;
-        AABB2f query_region = {
-            {mouse_pos.x - query_half_size, mouse_pos.y - query_half_size},
-            {mouse_pos.x + query_half_size, mouse_pos.y + query_half_size}
-        };
+        AABB2f query_region = {{{mouse_pos.x - query_half_size, mouse_pos.y - query_half_size}},
+                               {{mouse_pos.x + query_half_size, mouse_pos.y + query_half_size}}};
         auto queried_aabbs = aabbtree::query_aabb(&tree, query_region);
         for (usize i = 0; i < queried_aabbs.count; i++) {
             AABB2f *aabb = queried_aabbs[i];
-            DrawRectangle(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x,
-                          aabb->max.y - aabb->min.y, PURPLE);
-            DrawRectangleLines(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x,
-                               aabb->max.y - aabb->min.y, WHITE);
+            DrawRectangle(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x, aabb->max.y - aabb->min.y, PURPLE);
+            DrawRectangleLines(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x, aabb->max.y - aabb->min.y, WHITE);
         }
         arrlist::free(&queried_aabbs);
 
         // Draw the query region outline
         DrawRectangleLinesEx(
-            {query_region.min.x, query_region.min.y,
-             query_region.max.x - query_region.min.x,
-             query_region.max.y - query_region.min.y},
+            {query_region.min.x, query_region.min.y, query_region.max.x - query_region.min.x, query_region.max.y - query_region.min.y},
             2.0f, DARKGREEN);
 
         DrawRectangle(0, 0, 120, 40, WHITE);

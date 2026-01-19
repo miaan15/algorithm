@@ -2,10 +2,10 @@
 
 #include "aabbtree.hpp"
 
-#include "arrlist.hpp"
-#include "define.hpp"
-#include "math.hpp"
-#include "pool.hpp"
+#include <arrlist.hpp>
+#include <define.hpp>
+#include <math.hpp>
+#include <pool.hpp>
 
 namespace mia {
 

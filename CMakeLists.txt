@@ -1,0 +1,56 @@
+cmake_minimum_required(VERSION 3.25)
+
+project(MiaAlgorithm LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+endif()
+
+include(FetchContent)
+set(FETCHCONTENT_QUIET OFF)
+
+# FetchContent_Declare(
+#     raylib
+#     GIT_REPOSITORY git@github.com:raysan5/raylib.git
+#     GIT_TAG 5.5
+#     GIT_SHALLOW TRUE
+#     SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/raylib
+# )
+# FetchContent_MakeAvailable(raylib)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/raylib)
+
+set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+set(DEMO_DIR "${CMAKE_SOURCE_DIR}/demo")
+set(INC_DIRS 
+    "${SRC_DIR}"
+    "${SRC_DIR}/aabbtree"
+    "${SRC_DIR}/arena"
+    "${SRC_DIR}/arrlist"
+    "${SRC_DIR}/math"
+    "${SRC_DIR}/pool"
+    "${CMAKE_SOURCE_DIR}/vendor/raylib/src"
+)
+
+macro(create_lib target libs)
+    add_library(${target} "${SRC_DIR}/${target}/${target}.cpp")
+    target_include_directories(${target} PUBLIC ${INC_DIRS})
+    target_link_libraries(${target} PUBLIC ${libs})
+endmacro()
+
+macro(create_demo target libs)
+    set(target_demo "${target}_demo")
+    add_executable(${target_demo} "${DEMO_DIR}/${target}/main.cpp")
+    target_link_libraries(${target_demo} PRIVATE ${target})
+    target_link_libraries(${target_demo} PRIVATE ${libs})
+    target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
+endmacro()
+
+create_lib(aabbtree "")
+
+create_demo(aabbtree raylib)

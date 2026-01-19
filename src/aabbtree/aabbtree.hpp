@@ -1,10 +1,9 @@
 #ifndef AABBTREE_HPP
 #define AABBTREE_HPP
 
-#define ARRLIST_IMPLEMENTATION
-#include "arrlist.hpp"
-#include "define.hpp"
-#include "math.hpp"
+#include <arrlist.hpp>
+#include <define.hpp>
+#include <math.hpp>
 
 namespace mia {
 
