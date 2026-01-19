@@ -109,7 +109,7 @@ int main(void) {
         if (remove_mode) {
             // Remove each frame, insert each 6 frames
             if (!active_indices.empty() && frame_count % 1 == 0) {
-                for (auto _ = 0; _ < 1; _++) {
+                for (auto _ = 0; _ < 12; _++) {
                     usize random_idx = active_indices[GetRandomValue(0, active_indices.size() - 1)];
                     aabbtree::remove(&tree, &aabbs[random_idx]);
                     removed_indices.insert(random_idx);
@@ -132,7 +132,7 @@ int main(void) {
                 removed_indices.insert(random_idx);
             }
             if (!removed_indices.empty() && frame_count % 1 == 0) {
-                for (auto _ = 0; _ < 1; _++) {
+                for (auto _ = 0; _ < 12; _++) {
                     auto it = removed_indices.begin();
                     if (it == nullptr) continue;
                     std::advance(it, GetRandomValue(0, removed_indices.size() - 1));
@@ -189,6 +189,19 @@ int main(void) {
                           pair.second->max.y - pair.second->min.y, color);
         }
         arrlist::free(&pair_list);
+
+        // Query at cursor position and highlight detected AABBs
+        Vector2 mouse_pos = GetMousePosition();
+        Vec2f query_point_vec = {mouse_pos.x, mouse_pos.y};
+        auto queried_aabbs = aabbtree::query_point(&tree, query_point_vec);
+        for (usize i = 0; i < queried_aabbs.count; i++) {
+            AABB2f *aabb = queried_aabbs[i];
+            DrawRectangle(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x,
+                          aabb->max.y - aabb->min.y, PURPLE);
+            DrawRectangleLines(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x,
+                               aabb->max.y - aabb->min.y, WHITE);
+        }
+        arrlist::free(&queried_aabbs);
 
         DrawRectangle(0, 0, 120, 40, WHITE);
         DrawFPS(10, 10);

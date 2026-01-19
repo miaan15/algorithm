@@ -45,6 +45,7 @@ void _get_collided_pairs_helper(AABBPairList *list, AABBTreeNode *node0, AABBTre
 void _uncheck_all_node_flag_helper(AABBTreeNode *node);
 void _handle_self_collide_pair(AABBTreeNode *node, AABBPairList *list);
 auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_link) -> bool;
+void _handle_raycast_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur);
 
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb) {
@@ -130,6 +131,13 @@ void update(AABBTree *tree) {
     arrlist::free(&invalid_nodes);
 }
 
+[[nodiscard]] auto query_point(AABBTree *tree, const Vec2f &point) -> ArrList<AABB2f *> {
+    ArrList<AABB2f *> res{};
+    if (tree->root == nullptr) return res;
+    _handle_raycast_helper(&res, point, tree->root);
+    return res;
+}
+
 [[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList {
     AABBPairList res{};
 
@@ -176,7 +184,8 @@ void _insert_node_from_old(AABBTree *tree, AABBTreeNode *node) {
     }
 
     cauto fat_bound = (AABB2f){{aabb->min - (Vec2f){tree->margin, tree->margin}}, {aabb->max + (Vec2f){tree->margin, tree->margin}}};
-    auto best = (FitNodeValue){.node = tree->root, .link = &tree->root, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
+    auto best =
+        (FitNodeValue){.node = tree->root, .link = &tree->root, .value = aabb::volume(aabb::merge(fat_bound, tree->root->bound))};
     _find_best_fit_node_insert_helper(&best, fat_bound, tree->root, &tree->root, 0);
 
     node->bound = fat_bound;
@@ -306,6 +315,18 @@ auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_l
     }
 
     return res;
+}
+
+void _handle_raycast_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur) {
+    if (!aabb::contains(cur->bound, point)) return;
+    if (_is_node_leaf(*cur)) {
+        if (aabb::contains(*cur->data, point)) {
+            arrlist::append(list, cur->data);
+        }
+        return;
+    }
+    _handle_raycast_helper(list, point, cur->childs[0]);
+    _handle_raycast_helper(list, point, cur->childs[1]);
 }
 
 } // namespace mia
