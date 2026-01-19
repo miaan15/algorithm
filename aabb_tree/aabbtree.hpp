@@ -32,6 +32,7 @@ void insert(AABBTree *tree, AABB2f *aabb);
 auto remove(AABBTree *tree, AABB2f *aabb) -> bool;
 void update(AABBTree *tree);
 [[nodiscard]] auto query_point(AABBTree *tree, const Vec2f &point) -> ArrList<AABB2f *>;
+[[nodiscard]] auto query_aabb(AABBTree *tree, const AABB2f &aabb) -> ArrList<AABB2f *>;
 [[nodiscard]] auto get_collided_pairs(AABBTree *tree) -> AABBPairList;
 } // namespace aabbtree
 

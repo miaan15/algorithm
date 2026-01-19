@@ -61,10 +61,10 @@ int main(void) {
     SetTargetFPS(60);
 
     for (auto i = 0U; i < cnt; i++) {
-        float minX = GetRandomValue(0 + 1, 1600 - 10 - 1);
-        float minY = GetRandomValue(0 + 1, 900 - 10 - 1);
-        float maxX = minX + GetRandomValue(3, 10);
-        float maxY = minY + GetRandomValue(3, 10);
+        float minX = GetRandomValue(0 + 1, 1600 - 20 - 1);
+        float minY = GetRandomValue(0 + 1, 900 - 20 - 1);
+        float maxX = minX + GetRandomValue(3, 20);
+        float maxY = minY + GetRandomValue(3, 20);
 
         aabbs[i].min = {minX, minY};
         aabbs[i].max = {maxX, maxY};
@@ -190,10 +190,14 @@ int main(void) {
         }
         arrlist::free(&pair_list);
 
-        // Query at cursor position and highlight detected AABBs
+        // Query AABB around cursor position and highlight detected AABBs
         Vector2 mouse_pos = GetMousePosition();
-        Vec2f query_point_vec = {mouse_pos.x, mouse_pos.y};
-        auto queried_aabbs = aabbtree::query_point(&tree, query_point_vec);
+        constexpr float query_half_size = 50.0f;
+        AABB2f query_region = {
+            {mouse_pos.x - query_half_size, mouse_pos.y - query_half_size},
+            {mouse_pos.x + query_half_size, mouse_pos.y + query_half_size}
+        };
+        auto queried_aabbs = aabbtree::query_aabb(&tree, query_region);
         for (usize i = 0; i < queried_aabbs.count; i++) {
             AABB2f *aabb = queried_aabbs[i];
             DrawRectangle(aabb->min.x, aabb->min.y, aabb->max.x - aabb->min.x,
@@ -202,6 +206,13 @@ int main(void) {
                                aabb->max.y - aabb->min.y, WHITE);
         }
         arrlist::free(&queried_aabbs);
+
+        // Draw the query region outline
+        DrawRectangleLinesEx(
+            {query_region.min.x, query_region.min.y,
+             query_region.max.x - query_region.min.x,
+             query_region.max.y - query_region.min.y},
+            2.0f, DARKGREEN);
 
         DrawRectangle(0, 0, 120, 40, WHITE);
         DrawFPS(10, 10);

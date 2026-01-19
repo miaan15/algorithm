@@ -45,7 +45,8 @@ void _get_collided_pairs_helper(AABBPairList *list, AABBTreeNode *node0, AABBTre
 void _uncheck_all_node_flag_helper(AABBTreeNode *node);
 void _handle_self_collide_pair(AABBTreeNode *node, AABBPairList *list);
 auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_link) -> bool;
-void _handle_raycast_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur);
+void _handle_query_point_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur);
+void _handle_query_aabb_helper(ArrList<AABB2f *> *list, const AABB2f &aabb, AABBTreeNode *cur);
 
 namespace aabbtree {
 void insert(AABBTree *tree, AABB2f *aabb) {
@@ -134,7 +135,14 @@ void update(AABBTree *tree) {
 [[nodiscard]] auto query_point(AABBTree *tree, const Vec2f &point) -> ArrList<AABB2f *> {
     ArrList<AABB2f *> res{};
     if (tree->root == nullptr) return res;
-    _handle_raycast_helper(&res, point, tree->root);
+    _handle_query_point_helper(&res, point, tree->root);
+    return res;
+}
+
+[[nodiscard]] auto query_aabb(AABBTree *tree, const AABB2f &aabb) -> ArrList<AABB2f *> {
+    ArrList<AABB2f *> res{};
+    if (tree->root == nullptr) return res;
+    _handle_query_aabb_helper(&res, aabb, tree->root);
     return res;
 }
 
@@ -317,7 +325,7 @@ auto _handle_remove_helper(AABB2f *aabb, AABBTreeNode *cur, AABBTreeNode **cur_l
     return res;
 }
 
-void _handle_raycast_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur) {
+void _handle_query_point_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTreeNode *cur) {
     if (!aabb::contains(cur->bound, point)) return;
     if (_is_node_leaf(*cur)) {
         if (aabb::contains(*cur->data, point)) {
@@ -325,8 +333,21 @@ void _handle_raycast_helper(ArrList<AABB2f *> *list, const Vec2f &point, AABBTre
         }
         return;
     }
-    _handle_raycast_helper(list, point, cur->childs[0]);
-    _handle_raycast_helper(list, point, cur->childs[1]);
+    _handle_query_point_helper(list, point, cur->childs[0]);
+    _handle_query_point_helper(list, point, cur->childs[1]);
 }
+
+void _handle_query_aabb_helper(ArrList<AABB2f *> *list, const AABB2f &aabb, AABBTreeNode *cur) {
+    if (!aabb::intersects(cur->bound, aabb)) return;
+    if (_is_node_leaf(*cur)) {
+        if (aabb::intersects(*cur->data, aabb)) {
+            arrlist::append(list, cur->data);
+        }
+        return;
+    }
+    _handle_query_aabb_helper(list, aabb, cur->childs[0]);
+    _handle_query_aabb_helper(list, aabb, cur->childs[1]);
+}
+
 
 } // namespace mia
