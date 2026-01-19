@@ -349,5 +349,4 @@ void _handle_query_aabb_helper(ArrList<AABB2f *> *list, const AABB2f &aabb, AABB
     _handle_query_aabb_helper(list, aabb, cur->childs[1]);
 }
 
-
 } // namespace mia

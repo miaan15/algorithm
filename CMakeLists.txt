@@ -48,7 +48,7 @@ macro(create_demo target libs)
     add_executable(${target_demo} "${DEMO_DIR}/${target}/main.cpp")
     target_link_libraries(${target_demo} PRIVATE ${target})
     target_link_libraries(${target_demo} PRIVATE ${libs})
-    target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
+    target_compile_options(${target_demo} PRIVATE -Wall -Wextra -Wpedantic)
 endmacro()
 
 create_lib(aabbtree "")

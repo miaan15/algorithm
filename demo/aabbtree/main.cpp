@@ -66,8 +66,8 @@ int main(void) {
         float maxX = minX + GetRandomValue(3, 20);
         float maxY = minY + GetRandomValue(3, 20);
 
-        aabbs[i].min = {{minX, minY}};
-        aabbs[i].max = {{maxX, maxY}};
+        aabbs[i].min = {minX, minY};
+        aabbs[i].max = {maxX, maxY};
 
         aabbtree::insert(&tree, &aabbs[i]);
     }
@@ -194,8 +194,8 @@ int main(void) {
         // Query AABB around cursor position and highlight detected AABBs
         Vector2 mouse_pos = GetMousePosition();
         constexpr float query_half_size = 50.0f;
-        AABB2f query_region = {{{mouse_pos.x - query_half_size, mouse_pos.y - query_half_size}},
-                               {{mouse_pos.x + query_half_size, mouse_pos.y + query_half_size}}};
+        AABB2f query_region = {{mouse_pos.x - query_half_size, mouse_pos.y - query_half_size},
+                               {mouse_pos.x + query_half_size, mouse_pos.y + query_half_size}};
         auto queried_aabbs = aabbtree::query_aabb(&tree, query_region);
         for (usize i = 0; i < queried_aabbs.count; i++) {
             AABB2f *aabb = queried_aabbs[i];
