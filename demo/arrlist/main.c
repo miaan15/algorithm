@@ -10,6 +10,7 @@ typedef struct {
 
 DEFINE_ARRLIST(double)
 DEFINE_POOL(double)
+DEFINE_LIST(short)
 
 int main() {
     ArrList_double arr;
@@ -30,7 +31,10 @@ int main() {
     POOL_TRIM(&pool);
     POOL_FREE(&pool);
 
-    List_char list;
-    list_insert(&list, 41);
-    list_pop(&list);
+    List_short list;
+    auto x = LIST_INSERT(&list, 41);
+    LIST_POP(&list);
+    LIST_REMOVE(&list, x);
+    x = LIST_GET(&list, 41);
+    LIST_FREE(&list);
 }
