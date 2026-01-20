@@ -3,8 +3,6 @@
 
 #include <stdlib.h>
 
-#include "../def.h"
-
 #define DEFINE_ARRLIST(T)                                                                                                              \
     typedef struct {                                                                                                                   \
         size_t count;                                                                                                                  \

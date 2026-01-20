@@ -1,8 +1,6 @@
 #ifndef POOL_H
 #define POOL_H
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
