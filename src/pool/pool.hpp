@@ -12,7 +12,7 @@ namespace detail {
 template <typename T>
 struct PoolNode {
     union {
-        usize next;
+        size_t next;
         T data;
     };
     bool valid;
@@ -21,36 +21,29 @@ struct PoolNode {
 
 template <typename T>
 struct Pool {
-    usize capacity;
-    usize count;
-    usize max;
-    usize head;
+    size_t capacity;
+    size_t count;
+    size_t max;
+    size_t head;
     detail::PoolNode<T> *buffer;
-
-    T &operator[](usize index);
 };
 
 namespace detail {
 template <typename T>
-void _handle_capacity_extend(Pool<T> *pool, usize size_increase);
+void _handle_capacity_extend(Pool<T> *pool, size_t size_increase);
 } // namespace detail
-
-template <typename T>
-T &Pool<T>::operator[](usize index) {
-    return this->buffer[index].data;
-}
 
 namespace pool {
 template <typename T>
-bool is_valid(Pool<T> *pool, usize index) {
+bool is_valid(Pool<T> *pool, size_t index) {
     if (index >= pool->max) return false;
     return pool->buffer[index].valid;
 }
 
 template <typename T>
-void reserve(Pool<T> *pool, usize new_capacity) {
-    cauto old_capacity = pool->capacity;
-    cauto old_buffer = pool->buffer;
+void reserve(Pool<T> *pool, size_t new_capacity) {
+    const auto old_capacity = pool->capacity;
+    const auto old_buffer = pool->buffer;
 
     pool->capacity = new_capacity;
     pool->buffer = (detail::PoolNode<T> *)malloc(pool->capacity * sizeof(detail::PoolNode<T>));
@@ -61,10 +54,10 @@ void reserve(Pool<T> *pool, usize new_capacity) {
 }
 
 template <typename T>
-auto insert(Pool<T> *pool, const T &value) -> usize {
+auto insert(Pool<T> *pool, const T &value) -> size_t {
     if (pool->head >= pool->max) detail::_handle_capacity_extend(pool, 1);
 
-    cauto old_head = pool->head;
+    const auto old_head = pool->head;
     if (pool->head >= pool->max) {
         pool->head++;
         pool->max++;
@@ -81,7 +74,7 @@ auto insert(Pool<T> *pool, const T &value) -> usize {
 }
 
 template <typename T>
-void remove(Pool<T> *pool, usize index) {
+void remove(Pool<T> *pool, size_t index) {
     if (index >= pool->max) return;
 
     pool->buffer[index].valid = false;
@@ -132,10 +125,10 @@ void free(Pool<T> *pool) {
 template <typename T>
 struct PoolIterator {
     detail::PoolNode<T> *buffer;
-    usize index;
-    usize max;
+    size_t index;
+    size_t max;
 
-    PoolIterator(detail::PoolNode<T> *buf, usize idx, usize m) : buffer(buf), index(idx), max(m) {
+    PoolIterator(detail::PoolNode<T> *buf, size_t idx, size_t m) : buffer(buf), index(idx), max(m) {
         while (index < max && !buffer[index].valid) {
             index++;
         }
@@ -171,7 +164,7 @@ struct PoolIterator {
         return index != other.index;
     }
 
-    usize get_index() const {
+    size_t get_index() const {
         return index;
     }
 };
@@ -188,9 +181,9 @@ PoolIterator<T> end(Pool<T> &pool) {
 
 namespace detail {
 template <typename T>
-void _handle_capacity_extend(Pool<T> *pool, usize size_increase) {
+void _handle_capacity_extend(Pool<T> *pool, size_t size_increase) {
     if (pool->max + size_increase > pool->capacity) {
-        usize new_capacity = pool->capacity < 3 ? 3 : pool->capacity + (pool->capacity >> 1);
+        size_t new_capacity = pool->capacity < 3 ? 3 : pool->capacity + (pool->capacity >> 1);
 
         if (new_capacity < pool->max + size_increase) {
             new_capacity = pool->max + size_increase;

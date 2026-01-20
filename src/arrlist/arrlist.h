@@ -2,7 +2,6 @@
 #define ARRLIST_H
 
 #include <stdlib.h>
-#include <string.h>
 
 #include "../def.h"
 
@@ -12,8 +11,6 @@
         size_t capacity;                                                                                                               \
         T *buffer;                                                                                                                     \
     } ArrList_##T;
-
-DEFINE_ARRLIST(char)
 
 #define ARRLIST_RESERVE(arrlist, new_capacity)                                                                                         \
     do {                                                                                                                               \
