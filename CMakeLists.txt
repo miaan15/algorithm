@@ -25,6 +25,17 @@ set(FETCHCONTENT_QUIET OFF)
 # FetchContent_MakeAvailable(raylib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/raylib)
 
+# FetchContent_Declare(
+#     raylib
+#     GIT_REPOSITORY git@github.com:raysan5/raylib.git
+#     GIT_TAG 5.5
+#     GIT_SHALLOW TRUE
+#     SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/raylib
+# )
+# FetchContent_MakeAvailable(raylib)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/cglm)
+
+
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(DEMO_DIR "${CMAKE_SOURCE_DIR}/demo")
 set(INC_DIRS 
