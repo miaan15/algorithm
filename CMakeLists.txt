@@ -43,7 +43,7 @@ set(INC_DIRS
     "${SRC_DIR}/aabbtree"
     "${SRC_DIR}/arena"
     "${SRC_DIR}/arrlist"
-    "${SRC_DIR}/math"
+    "${SRC_DIR}/list"
     "${SRC_DIR}/pool"
     "${CMAKE_SOURCE_DIR}/vendor/raylib/src"
 )

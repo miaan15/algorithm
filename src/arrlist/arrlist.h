@@ -14,7 +14,7 @@
     do {                                                                                                                               \
         (arrlist)->capacity = new_capacity;                                                                                            \
         void *new_buffer = realloc((arrlist)->buffer, new_capacity * sizeof(*(arrlist)->buffer));                                      \
-        if (new_buffer == NULL) {                                                                                                      \
+        if (new_buffer == nullptr) {                                                                                                      \
             break;                                                                                                                     \
         }                                                                                                                              \
         (arrlist)->buffer = new_buffer;                                                                                                \

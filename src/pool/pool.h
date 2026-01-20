@@ -11,14 +11,14 @@
             T data;                                                                                                                    \
         };                                                                                                                             \
         bool valid;                                                                                                                    \
-    } _Pool_Node_##T;                                                                                                                  \
+    } _PoolNode_##T;                                                                                                                  \
                                                                                                                                        \
     typedef struct {                                                                                                                   \
         size_t capacity;                                                                                                               \
         size_t count;                                                                                                                  \
         size_t max_count;                                                                                                              \
         size_t head;                                                                                                                   \
-        _Pool_Node_##T *buffer;                                                                                                        \
+        _PoolNode_##T *buffer;                                                                                                        \
     } Pool_##T;
 
 #define _POOL_HANDLE_CAPACITY_EXTEND(pool, size_increase)                                                                              \
@@ -52,7 +52,7 @@
         (pool)->capacity = (new_capacity);                                                                                             \
         (pool)->buffer = (typeof((pool)->buffer))malloc((pool)->capacity * sizeof(*(pool)->buffer));                                   \
                                                                                                                                        \
-        if (__old_buffer != NULL) {                                                                                                    \
+        if (__old_buffer != nullptr) {                                                                                                    \
             memcpy((pool)->buffer, __old_buffer, __old_capacity * sizeof(*(pool)->buffer));                                            \
             free(__old_buffer);                                                                                                        \
         }                                                                                                                              \
@@ -106,7 +106,7 @@
     do {                                                                                                                               \
         if ((pool)->max_count == 0) {                                                                                                  \
             free((pool)->buffer);                                                                                                      \
-            (pool)->buffer = NULL;                                                                                                     \
+            (pool)->buffer = nullptr;                                                                                                     \
             (pool)->capacity = 0;                                                                                                      \
             break;                                                                                                                     \
         }                                                                                                                              \
@@ -117,10 +117,10 @@
 
 #define POOL_FREE(pool)                                                                                                                \
     do {                                                                                                                               \
-        if ((pool)->buffer == NULL) break;                                                                                             \
+        if ((pool)->buffer == nullptr) break;                                                                                             \
                                                                                                                                        \
         free((pool)->buffer);                                                                                                          \
-        (pool)->buffer = NULL;                                                                                                         \
+        (pool)->buffer = nullptr;                                                                                                         \
         (pool)->count = 0;                                                                                                             \
         (pool)->max_count = 0;                                                                                                         \
         (pool)->head = 0;                                                                                                              \

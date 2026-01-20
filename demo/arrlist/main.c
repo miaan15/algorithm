@@ -1,5 +1,6 @@
 #include "arrlist.h"
 #include "pool.h"
+#include "list.h"
 
 typedef struct {
     int a, b;
@@ -28,4 +29,8 @@ int main() {
     POOL_CLEAR(&pool);
     POOL_TRIM(&pool);
     POOL_FREE(&pool);
+
+    List_char list;
+    list_insert(&list, 41);
+    list_pop(&list);
 }
