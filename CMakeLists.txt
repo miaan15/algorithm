@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(MiaAlgorithm LANGUAGES CXX)
+project(MiaAlgorithm LANGUAGES C)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -23,7 +23,7 @@ set(FETCHCONTENT_QUIET OFF)
 #     SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/raylib
 # )
 # FetchContent_MakeAvailable(raylib)
-add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/raylib)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/raylib)
 
 # FetchContent_Declare(
 #     raylib
@@ -49,19 +49,26 @@ set(INC_DIRS
 )
 
 macro(create_lib target libs)
-    add_library(${target} "${SRC_DIR}/${target}/${target}.cpp")
+    add_library(${target} "${SRC_DIR}/${target}/${target}.c")
     target_include_directories(${target} PUBLIC ${INC_DIRS})
     target_link_libraries(${target} PUBLIC ${libs})
 endmacro()
 
 macro(create_demo target libs)
     set(target_demo "${target}_demo")
-    add_executable(${target_demo} "${DEMO_DIR}/${target}/main.cpp")
+    add_executable(${target_demo} "${DEMO_DIR}/${target}/main.c")
+    target_include_directories(${target_demo} PRIVATE ${INC_DIRS})
     target_link_libraries(${target_demo} PRIVATE ${target})
     target_link_libraries(${target_demo} PRIVATE ${libs})
-    target_compile_options(${target_demo} PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
 endmacro()
 
-create_lib(aabbtree "")
+macro(create_demo_nolink target)
+    set(target_demo "${target}_demo")
+    add_executable(${target_demo} "${DEMO_DIR}/${target}/main.c")
+    target_include_directories(${target_demo} PRIVATE ${INC_DIRS})
+    target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
+endmacro()
 
-create_demo(aabbtree raylib)
+
+create_demo_nolink(arrlist)
