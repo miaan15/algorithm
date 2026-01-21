@@ -40,7 +40,7 @@ void _aabbtree_find_best_fit_node_helper(_AABBTree_FitNodeValue *best, AABB boun
     }
 }
 
-AABBs *aabbtree_insert(AABBTree *tree, AABB aabb) {
+AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
     // create new aabb saved to tree->data
     auto *data = LIST_INSERT(&tree->data, glms_mat2x3_make(aabb[0]));
 
@@ -105,6 +105,12 @@ AABBs *aabbtree_insert(AABBTree *tree, AABB aabb) {
     }
 
     return data;
+}
+AABBs *aabbtree_insert(AABBTree *tree, AABB aabb) {
+    return aabbtree_insert_type(tree, aabb, NORMAL);
+}
+AABBs *aabbtree_insert_inert(AABBTree *tree, AABB aabb) {
+    return aabbtree_insert_type(tree, aabb, INERT);
 }
 
 void _aabbtree_get_invalid_nodes_helper(ArrList_uintptr_t *invalid_list, _AABBTree_Node *cur) {
