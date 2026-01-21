@@ -89,11 +89,11 @@ AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
     auto *new_parent = (_AABBTree_Node *)malloc(sizeof(_AABBTree_Node));
     new_parent->is_self_check = false;
     new_parent->data = nullptr;
-    new_parent->type = 0;
     glm_aabb_merge(best.node->bounds, new_node->bounds, new_parent->bounds);
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
     new_parent->childs[1] = new_node;
+    new_parent->type = new_parent->childs[0]->type & new_parent->childs[1]->type;
 
     // linking to new parent
     best.node->parent = new_parent;
@@ -115,6 +115,57 @@ AABBs *aabbtree_insert(AABBTree *tree, AABB aabb) {
 }
 AABBs *aabbtree_insert_inert(AABBTree *tree, AABB aabb) {
     return aabbtree_insert_type(tree, aabb, INERT);
+}
+
+bool _handle_remove_helper(AABBs *data, _AABBTree_Node *cur, _AABBTree_Node **cur_link) {
+    bool res = false;
+    if (!_is_node_leaf(cur->childs[0])) {
+        if (glm_aabb_contains(cur->childs[0]->bounds, data->raw)) {
+            res |= _handle_remove_helper(data, cur->childs[0], &cur->childs[0]);
+        }
+    } else {
+        if (cur->childs[0]->data == data) {
+            *cur_link = cur->childs[1];
+            cur->childs[1]->parent = cur->parent;
+            free(cur->childs[0]);
+            free(cur);
+            return true;
+        }
+    }
+
+    if (!_is_node_leaf(cur->childs[1])) {
+        if (glm_aabb_contains(cur->childs[1]->bounds, data->raw)) {
+            res |= _handle_remove_helper(data, cur->childs[1], &cur->childs[1]);
+        }
+    } else {
+        if (cur->childs[1]->data == data) {
+            *cur_link = cur->childs[0];
+            cur->childs[0]->parent = cur->parent;
+            free(cur->childs[1]);
+            free(cur);
+            return true;
+        }
+    }
+
+    if (res) {
+        glm_aabb_merge(cur->childs[0]->bounds, cur->childs[1]->bounds, cur->bounds);
+        cur->type = cur->childs[0]->type & cur->childs[1]->type;
+    }
+
+    return res;
+}
+
+bool aabbtree_remove(AABBTree *tree, AABBs *data) {
+    if (tree->root == nullptr) return false;
+    if (_is_node_leaf(tree->root)) {
+        if (data == tree->root->data) {
+            tree->root = nullptr;
+            free(tree->root);
+            return true;
+        }
+        return false;
+    }
+    return _handle_remove_helper(data, tree->root, &tree->root);
 }
 
 void _get_invalid_nodes_helper(ArrList_uintptr_t *invalid_list, _AABBTree_Node *cur) {
@@ -167,11 +218,11 @@ void _handle_reinsert_node(AABBTree *tree, _AABBTree_Node *node) {
     auto *new_parent = (_AABBTree_Node *)malloc(sizeof(_AABBTree_Node));
     new_parent->is_self_check = false;
     new_parent->data = nullptr;
-    new_parent->type = 0;
     glm_aabb_merge(best.node->bounds, node->bounds, new_parent->bounds);
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
     new_parent->childs[1] = node;
+    new_parent->type = new_parent->childs[0]->type & new_parent->childs[1]->type;
 
     best.node->parent = new_parent;
     node->parent = new_parent;

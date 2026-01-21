@@ -15,23 +15,24 @@ extern "C" {
 constexpr u32 window_width = 1600;
 constexpr u32 window_height = 900;
 
-constexpr size_t box_cnt = 670;
-constexpr f32 box_min_sz = 5;
-constexpr f32 box_max_sz = 10;
-constexpr f32 box_min_speed = 10;
+constexpr size_t box_cnt = 6700;
+constexpr f32 box_min_sz = 10;
+constexpr f32 box_max_sz = 30;
+constexpr f32 box_min_speed = 80;
 constexpr f32 box_max_speed = 100;
 
-constexpr size_t inert_box_cnt = 670;
-constexpr f32 inert_box_min_sz = 10;
-constexpr f32 inert_box_max_sz = 30;
-constexpr f32 inert_box_offset_x = 200;
+constexpr size_t inert_box_cnt = 6700;
+constexpr f32 inert_box_min_sz = 5;
+constexpr f32 inert_box_max_sz = 10;
+constexpr f32 inert_box_offset_x = 100;
 constexpr f32 inert_box_offset_y = 50;
-constexpr f32 inert_box_min_speed = 5;
-constexpr f32 inert_box_max_speed = 20;
+constexpr f32 inert_box_min_speed = 10;
+constexpr f32 inert_box_max_speed = 30;
 
 constexpr Color box_color = SKYBLUE;
 constexpr Color inert_box_color = DARKBLUE;
-constexpr Color bounds_color = LIME;
+constexpr Color bounds_color = GREEN;
+constexpr Color inert_bounds_color = LIME;
 constexpr Color collided_color = RED;
 
 void handle_box_moving(std::pair<AABBs *, vec3s> &box, f32 dt) {
@@ -68,8 +69,8 @@ void handle_box_moving(std::pair<AABBs *, vec3s> &box, f32 dt) {
     }
 }
 
-void get_box_bounds_helper(std::vector<AABBs> &bounds_list, _AABBTree_Node *cur) {
-    bounds_list.push_back(glms_mat2x3_make(cur->bounds[0]));
+void get_box_bounds_helper(std::vector<_AABBTree_Node *> &bounds_list, _AABBTree_Node *cur) {
+    bounds_list.push_back(cur);
 
     if (cur->childs[0] != nullptr) get_box_bounds_helper(bounds_list, cur->childs[0]);
     if (cur->childs[1] != nullptr) get_box_bounds_helper(bounds_list, cur->childs[1]);
@@ -137,11 +138,13 @@ int main() {
         ClearBackground(RAYWHITE);
 
         // Draw inert bounds
-        std::vector<AABBs> bounds_list;
-        get_box_bounds_helper(bounds_list, tree.root);
-        for (auto &b : bounds_list) {
-            DrawRectangleLines(b.raw[0][0], b.raw[0][1], b.raw[1][0] - b.raw[0][0], b.raw[1][1] - b.raw[0][1], bounds_color);
-        }
+        // std::vector<_AABBTree_Node *> bounds_list;
+        // get_box_bounds_helper(bounds_list, tree.root);
+        // for (auto *node : bounds_list) {
+        //     auto b = node->bounds;
+        //     auto color = node->type ? inert_bounds_color : bounds_color;
+        //     DrawRectangleLines(b[0][0], b[0][1], b[1][0] - b[0][0], b[1][1] - b[0][1], color);
+        // }
 
         // Draw boxes
         for (auto &p : inert_box_data_list) {
