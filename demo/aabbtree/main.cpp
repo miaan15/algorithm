@@ -141,6 +141,8 @@ int main() {
         EndDrawing();
     }
 
+    aabbtree_free(&tree);
+
     CloseWindow();
 
     return 0;

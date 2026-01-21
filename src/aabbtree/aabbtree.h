@@ -52,6 +52,7 @@ typedef ArrList_AABBTreeDataPair AABBTreeDataPairList;
 AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type);
 void aabbtree_update(AABBTree *tree);
 AABBTreeDataPairList aabbtree_get_collided_pairs(AABBTree *tree);
+void aabbtree_free(AABBTree *tree);
 
 AABBs *aabbtree_insert(AABBTree *tree, AABB aabb);
 AABBs *aabbtree_insert_inert(AABBTree *tree, AABB aabb);

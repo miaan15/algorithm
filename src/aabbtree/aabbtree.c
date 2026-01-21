@@ -286,3 +286,17 @@ AABBTreeDataPairList aabbtree_get_collided_pairs(AABBTree *tree) {
 
     return res;
 }
+
+void _free_tree_helper(_AABBTree_Node *cur) {
+    if (cur == nullptr) return;
+
+    if (cur->childs[0] != nullptr) _free_tree_helper(cur->childs[0]);
+    if (cur->childs[1] != nullptr) _free_tree_helper(cur->childs[1]);
+
+    free(cur);
+}
+
+void aabbtree_free(AABBTree *tree) {
+    _free_tree_helper(tree->root);
+    LIST_FREE(&tree->data);
+}
