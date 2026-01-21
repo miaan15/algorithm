@@ -6,7 +6,10 @@ extern "C" {
 #include <cglm/struct.h>
 #include <cglm/types.h>
 #include <cglm/vec3.h>
+#include <print>
 #include <raylib.h>
+#include <set>
+#include <utility>
 #include <vector>
 
 #include "def.h"
@@ -14,11 +17,11 @@ extern "C" {
 constexpr u32 window_width = 1600;
 constexpr u32 window_height = 900;
 
-constexpr size_t box_cnt = 1000;
-constexpr f32 box_min_sz = 10;
-constexpr f32 box_max_sz = 30;
-constexpr f32 box_min_speed = 5;
-constexpr f32 box_max_speed = 60;
+constexpr size_t box_cnt = 10000;
+constexpr f32 box_min_sz = 2;
+constexpr f32 box_max_sz = 10;
+constexpr f32 box_min_speed = 2;
+constexpr f32 box_max_speed = 10;
 
 constexpr Color box_color = BLUE;
 constexpr Color bounds_color = GREEN;
@@ -66,7 +69,7 @@ void get_box_bounds_helper(std::vector<AABBs> &bounds_list, _AABBTree_Node *cur)
 
 int main() {
     AABBTree tree{};
-    tree.margin = 7.0;
+    tree.margin = 3;
 
     InitWindow(window_width, window_height, "aabbtree demo");
 
@@ -98,15 +101,17 @@ int main() {
 
         aabbtree_update(&tree);
 
+        auto collided_list = aabbtree_get_collided_pairs(&tree);
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Draw bounds
-        std::vector<AABBs> bounds_list;
-        get_box_bounds_helper(bounds_list, tree.root);
-        for (auto &b : bounds_list) {
-            DrawRectangleLines(b.raw[0][0], b.raw[0][1], b.raw[1][0] - b.raw[0][0], b.raw[1][1] - b.raw[0][1], bounds_color);
-        }
+        // // Draw bounds
+        // std::vector<AABBs> bounds_list;
+        // get_box_bounds_helper(bounds_list, tree.root);
+        // for (auto &b : bounds_list) {
+        //     DrawRectangleLines(b.raw[0][0], b.raw[0][1], b.raw[1][0] - b.raw[0][0], b.raw[1][1] - b.raw[0][1], bounds_color);
+        // }
 
         // Draw boxes
         for (auto &p : box_data_list) {
@@ -115,6 +120,21 @@ int main() {
             DrawRectangle(box->raw[0][0], box->raw[0][1], box->raw[1][0] - box->raw[0][0], box->raw[1][1] - box->raw[0][1], box_color);
             DrawRectangleLines(box->raw[0][0], box->raw[0][1], box->raw[1][0] - box->raw[0][0], box->raw[1][1] - box->raw[0][1], BLACK);
         }
+
+        // Draw collided boxes
+        // u32 cnt = 0, total = 0;
+        // std::set<std::pair<uintptr_t, uintptr_t>> pair_set{};
+        // for (size_t i = 0; i < collided_list.count; i++) {
+        //     auto &p = collided_list.buffer[i];
+        //     total++;
+        //     if (pair_set.contains({(uintptr_t)p.raw[1], (uintptr_t)p.raw[0]})) {
+        //         cnt++;
+        //     }
+        //     pair_set.insert({(uintptr_t)p.raw[0], (uintptr_t)p.raw[1]});
+        //     pair_set.insert({(uintptr_t)p.raw[1], (uintptr_t)p.raw[0]});
+        // }
+        // std::print("TOAL: {}; DUP: {}\n", total, cnt);
+        // ARRLIST_FREE(&collided_list);
 
         DrawFPS(10, 10);
 
