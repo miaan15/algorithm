@@ -8,34 +8,7 @@
 #include "../arrlist/arrlist.h"
 #include "../list/list.h"
 
-typedef mat2x3 AABB;
-typedef mat2x3s AABBs;
-
-DEFINE_LIST(AABBs)
 DEFINE_ARRLIST(uintptr_t);
-
-typedef struct _AABBTree_Node _AABBTree_Node;
-typedef struct _AABBTree_FitNodeValue _AABBTree_FitNodeValue;
-struct _AABBTree_Node {
-    _AABBTree_Node *parent;
-    _AABBTree_Node *childs[2];
-
-    AABB bounds;
-    AABBs *data;
-
-    bool is_self_check;
-};
-struct _AABBTree_FitNodeValue {
-    _AABBTree_Node *node;
-    _AABBTree_Node **link;
-    float value;
-};
-
-struct AABBTree {
-    List_AABBs data;
-    _AABBTree_Node *root;
-    float margin;
-};
 
 float _aabb_volume(vec3 aabb[2]) {
     vec3 size;
@@ -67,7 +40,7 @@ void _aabbtree_find_best_fit_node_helper(_AABBTree_FitNodeValue *best, AABB boun
     }
 }
 
-void aabbtree_insert(AABBTree *tree, AABB aabb) {
+AABBs *aabbtree_insert(AABBTree *tree, AABB aabb) {
     // create new aabb saved to tree->data
     auto *data = LIST_INSERT(&tree->data, glms_mat2x3_make(aabb[0]));
 
@@ -84,7 +57,7 @@ void aabbtree_insert(AABBTree *tree, AABB aabb) {
 
         tree->root = node;
 
-        return;
+        return data;
     }
 
     // try to find best node to insert into
@@ -130,6 +103,8 @@ void aabbtree_insert(AABBTree *tree, AABB aabb) {
         glm_aabb_merge(ucur_node->childs[0]->bounds, ucur_node->childs[1]->bounds, ucur_node->bounds);
         ucur_node = ucur_node->parent;
     }
+
+    return data;
 }
 
 void _aabbtree_get_invalid_nodes_helper(ArrList_uintptr_t *invalid_list, _AABBTree_Node *cur) {
