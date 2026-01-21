@@ -134,6 +134,8 @@ void _handle_reinsert_node(AABBTree *tree, _AABBTree_Node *node) {
         glm_vec3_add(aabb[1], margin_vec, node->bounds[1]);
         // no need to reassign node->data
 
+        node->parent = nullptr;
+
         tree->root = node;
 
         return;
