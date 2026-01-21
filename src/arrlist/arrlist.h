@@ -14,7 +14,7 @@
     do {                                                                                                                               \
         (arrlist)->capacity = new_capacity;                                                                                            \
         void *new_buffer = realloc((arrlist)->buffer, new_capacity * sizeof(*(arrlist)->buffer));                                      \
-        if (new_buffer == nullptr) {                                                                                                      \
+        if (new_buffer == nullptr) {                                                                                                   \
             break;                                                                                                                     \
         }                                                                                                                              \
         (arrlist)->buffer = new_buffer;                                                                                                \
@@ -37,7 +37,7 @@
 #define ARRLIST_APPEND(arrlist, value)                                                                                                 \
     do {                                                                                                                               \
         _ARRLIST_HANDLE_CAPACITY_EXTEND((arrlist), 1);                                                                                 \
-        (arrlist)->buffer[(arrlist)->count++] = value;                                                                                \
+        (arrlist)->buffer[(arrlist)->count++] = value;                                                                                 \
     } while (0);
 
 #define ARRLIST_INSERT(arrlist, index, value)                                                                                          \
@@ -53,7 +53,7 @@
         for (size_t i = (arrlist)->count - 1; i >= index; i--) {                                                                       \
             (arrlist)->buffer[i + 1] = (arrlist)->buffer[i];                                                                           \
         }                                                                                                                              \
-        (arrlist)->buffer[index] = value;                                                                                             \
+        (arrlist)->buffer[index] = value;                                                                                              \
         (arrlist)->count++;                                                                                                            \
     } while (0);
 
@@ -83,7 +83,7 @@
         }                                                                                                                              \
                                                                                                                                        \
         (arrlist)->capacity = (arrlist)->count;                                                                                        \
-        (arrlist)->buffer = realloc((arrlist)->buffer, (arrlist)->capacity * sizeof(*(arrlist)->buffer));                      \
+        (arrlist)->buffer = realloc((arrlist)->buffer, (arrlist)->capacity * sizeof(*(arrlist)->buffer));                              \
     } while (0);
 
 #define ARRLIST_FREE(arrlist)                                                                                                          \
