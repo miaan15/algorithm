@@ -15,13 +15,22 @@ extern "C" {
 constexpr u32 window_width = 1600;
 constexpr u32 window_height = 900;
 
-constexpr size_t box_cnt = 500;
-constexpr f32 box_min_sz = 10;
-constexpr f32 box_max_sz = 30;
+constexpr size_t box_cnt = 670;
+constexpr f32 box_min_sz = 5;
+constexpr f32 box_max_sz = 10;
 constexpr f32 box_min_speed = 10;
 constexpr f32 box_max_speed = 100;
 
-constexpr Color box_color = BLUE;
+constexpr size_t inert_box_cnt = 670;
+constexpr f32 inert_box_min_sz = 10;
+constexpr f32 inert_box_max_sz = 30;
+constexpr f32 inert_box_offset_x = 200;
+constexpr f32 inert_box_offset_y = 50;
+constexpr f32 inert_box_min_speed = 5;
+constexpr f32 inert_box_max_speed = 20;
+
+constexpr Color box_color = SKYBLUE;
+constexpr Color inert_box_color = DARKBLUE;
 constexpr Color bounds_color = LIME;
 constexpr Color collided_color = RED;
 
@@ -91,10 +100,32 @@ int main() {
         box_data_list.push_back({data, velocity});
     }
 
+    std::vector<std::pair<AABBs *, vec3s>> inert_box_data_list{};
+    for (size_t i = 0; i < inert_box_cnt; i++) {
+        f32 minX = GetRandomValue(0 + inert_box_offset_x, window_width - inert_box_offset_x - inert_box_max_sz);
+        f32 minY = GetRandomValue(0 + inert_box_offset_y, window_height - inert_box_offset_y - inert_box_max_sz);
+        f32 maxX = minX + GetRandomValue(inert_box_min_sz, inert_box_max_sz);
+        f32 maxY = minY + GetRandomValue(inert_box_min_sz, inert_box_max_sz);
+
+        AABB aabb = {{minX, minY, 0}, {maxX, maxY, 1}};
+        auto *data = aabbtree_insert_inert(&tree, aabb);
+
+        f32 speed = GetRandomValue(inert_box_min_speed, inert_box_max_speed);
+        f32 angle = GetRandomValue(0, 360) * DEG2RAD;
+        vec3s velocity;
+        velocity.raw[0] = cos(angle) * speed;
+        velocity.raw[1] = sin(angle) * speed;
+
+        inert_box_data_list.push_back({data, velocity});
+    }
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
         for (auto &p : box_data_list) {
+            handle_box_moving(p, dt);
+        }
+        for (auto &p : inert_box_data_list) {
             handle_box_moving(p, dt);
         }
 
@@ -105,7 +136,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Draw bounds
+        // Draw inert bounds
         std::vector<AABBs> bounds_list;
         get_box_bounds_helper(bounds_list, tree.root);
         for (auto &b : bounds_list) {
@@ -113,6 +144,13 @@ int main() {
         }
 
         // Draw boxes
+        for (auto &p : inert_box_data_list) {
+            auto box = p.first;
+
+            DrawRectangle(box->raw[0][0], box->raw[0][1], box->raw[1][0] - box->raw[0][0], box->raw[1][1] - box->raw[0][1],
+                          inert_box_color);
+            DrawRectangleLines(box->raw[0][0], box->raw[0][1], box->raw[1][0] - box->raw[0][0], box->raw[1][1] - box->raw[0][1], BLACK);
+        }
         for (auto &p : box_data_list) {
             auto box = p.first;
 

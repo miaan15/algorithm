@@ -54,6 +54,7 @@ AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
         glm_vec3_sub(aabb[0], margin_vec, node->bounds[0]);
         glm_vec3_add(aabb[1], margin_vec, node->bounds[1]);
         node->data = data;
+        node->type = type;
 
         tree->root = node;
 
@@ -82,11 +83,13 @@ AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
     new_node->is_self_check = false;
     glm_mat2x3_copy(fat_bounds, new_node->bounds);
     new_node->data = data;
+    new_node->type = type;
 
     // construct common parent node of best node and new node
     auto *new_parent = (_AABBTree_Node *)malloc(sizeof(_AABBTree_Node));
     new_parent->is_self_check = false;
     new_parent->data = nullptr;
+    new_parent->type = 0;
     glm_aabb_merge(best.node->bounds, new_node->bounds, new_parent->bounds);
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
@@ -100,6 +103,7 @@ AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
     // update upper nodes bounds
     auto *ucur_node = new_parent->parent;
     while (ucur_node != nullptr) {
+        ucur_node->type = ucur_node->childs[0]->type & ucur_node->childs[1]->type;
         glm_aabb_merge(ucur_node->childs[0]->bounds, ucur_node->childs[1]->bounds, ucur_node->bounds);
         ucur_node = ucur_node->parent;
     }
@@ -163,6 +167,7 @@ void _handle_reinsert_node(AABBTree *tree, _AABBTree_Node *node) {
     auto *new_parent = (_AABBTree_Node *)malloc(sizeof(_AABBTree_Node));
     new_parent->is_self_check = false;
     new_parent->data = nullptr;
+    new_parent->type = 0;
     glm_aabb_merge(best.node->bounds, node->bounds, new_parent->bounds);
     new_parent->parent = best.node->parent;
     new_parent->childs[0] = best.node;
@@ -175,6 +180,7 @@ void _handle_reinsert_node(AABBTree *tree, _AABBTree_Node *node) {
     // update upper nodes bounds
     auto *ucur_node = new_parent->parent;
     while (ucur_node != nullptr) {
+        ucur_node->type = ucur_node->childs[0]->type & ucur_node->childs[1]->type;
         glm_aabb_merge(ucur_node->childs[0]->bounds, ucur_node->childs[1]->bounds, ucur_node->bounds);
         ucur_node = ucur_node->parent;
     }
@@ -234,6 +240,8 @@ void _handle_self_collide_pair(AABBTreeDataPairList *list, _AABBTree_Node *node)
     }
 }
 void _get_collided_pairs_helper(AABBTreeDataPairList *list, _AABBTree_Node *node0, _AABBTree_Node *node1) {
+    if (node0->type == INERT && node1->type == INERT) return;
+
     if (_is_node_leaf(node0) && _is_node_leaf(node1)) {
         if (glm_aabb_aabb(node0->data->raw, node1->data->raw)) {
             AABBTreeDataPair pair = {node0->data, node1->data};
@@ -243,15 +251,14 @@ void _get_collided_pairs_helper(AABBTreeDataPairList *list, _AABBTree_Node *node
     }
 
     if (!glm_aabb_aabb(node0->bounds, node1->bounds)) {
-        if (!_is_node_leaf(node0)) _handle_self_collide_pair(list, node0);
-
-        if (!_is_node_leaf(node1)) _handle_self_collide_pair(list, node1);
+        if (!_is_node_leaf(node0) && node0->type != INERT) _handle_self_collide_pair(list, node0);
+        if (!_is_node_leaf(node1) && node1->type != INERT) _handle_self_collide_pair(list, node1);
 
         return;
     }
 
     if (_is_node_leaf(node0)) {
-        _handle_self_collide_pair(list, node1);
+        if (node1->type != INERT) _handle_self_collide_pair(list, node1);
 
         _get_collided_pairs_helper(list, node0, node1->childs[0]);
         _get_collided_pairs_helper(list, node0, node1->childs[1]);
@@ -259,7 +266,7 @@ void _get_collided_pairs_helper(AABBTreeDataPairList *list, _AABBTree_Node *node
         return;
     }
     if (_is_node_leaf(node1)) {
-        _handle_self_collide_pair(list, node0);
+        if (node0->type != INERT) _handle_self_collide_pair(list, node0);
 
         _get_collided_pairs_helper(list, node0->childs[0], node1);
         _get_collided_pairs_helper(list, node0->childs[1], node1);
@@ -267,8 +274,8 @@ void _get_collided_pairs_helper(AABBTreeDataPairList *list, _AABBTree_Node *node
         return;
     }
 
-    _handle_self_collide_pair(list, node0);
-    _handle_self_collide_pair(list, node1);
+    if (node0->type != INERT) _handle_self_collide_pair(list, node0);
+    if (node1->type != INERT) _handle_self_collide_pair(list, node1);
 
     _get_collided_pairs_helper(list, node0->childs[0], node1->childs[0]);
     _get_collided_pairs_helper(list, node0->childs[0], node1->childs[1]);
