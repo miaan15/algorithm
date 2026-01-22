@@ -5,8 +5,8 @@
 #include <cglm/types.h>
 #include <cglm/vec3.h>
 
-#include "../arrlist/arrlist.h"
-#include "../list/list.h"
+#include "arrlist.h"
+#include "slist.h"
 
 DEFINE_ARRLIST(uintptr_t);
 
@@ -42,7 +42,7 @@ void _find_best_fit_node_helper(_AABBTree_FitNodeValue *best, AABB bounds, float
 
 AABBs *aabbtree_insert_type(AABBTree *tree, AABB aabb, AABBTreeNodeType type) {
     // create new aabb saved to tree->data
-    auto *data = LIST_INSERT(&tree->data, glms_mat2x3_make(aabb[0]));
+    auto *data = SLIST_INSERT(&tree->data, glms_mat2x3_make(aabb[0]));
 
     // if tree have nothing
     if (tree->root == nullptr) {
@@ -356,5 +356,5 @@ void _free_tree_helper(_AABBTree_Node *cur) {
 
 void aabbtree_free(AABBTree *tree) {
     _free_tree_helper(tree->root);
-    LIST_FREE(&tree->data);
+    SLIST_FREE(&tree->data);
 }

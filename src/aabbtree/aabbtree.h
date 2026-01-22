@@ -5,12 +5,12 @@
 #include <cglm/types.h>
 
 #include "arrlist.h"
-#include "list.h"
+#include "slist.h"
 
 typedef mat2x3 AABB;
 typedef mat2x3s AABBs;
 
-DEFINE_LIST(AABBs)
+DEFINE_SLIST(AABBs)
 
 typedef enum { NORMAL = 0, INERT = 1 } AABBTreeNodeType;
 
@@ -33,7 +33,7 @@ typedef struct {
 } _AABBTree_FitNodeValue;
 
 typedef struct {
-    List_AABBs data;
+    SList_AABBs data;
     _AABBTree_Node *root;
     float margin;
 } AABBTree;
