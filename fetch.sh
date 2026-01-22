@@ -11,3 +11,11 @@ fi
 if [ ! -d "./vendor/cglm" ]; then
     git clone --depth 1 --branch v0.9.6 https://github.com/recp/cglm.git ./vendor/cglm
 fi
+
+if [ ! -d "./vendor/googletest" ]; then
+    git clone --depth 1 --branch v1.17.0 https://github.com/google/googletest.git ./vendor/googletest
+fi
+
+if [ ! -d "./vendor/benchmark" ]; then
+    git clone --depth 1 --branch v1.9.5 https://github.com/google/benchmark.git ./vendor/benchmark
+fi

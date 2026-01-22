@@ -18,29 +18,14 @@ endif()
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
 
-# FetchContent_Declare(
-#     raylib
-#     GIT_REPOSITORY git@github.com:raysan5/raylib.git
-#     GIT_TAG 5.5
-#     GIT_SHALLOW TRUE
-#     SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/raylib
-# )
-# FetchContent_MakeAvailable(raylib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/raylib)
-
-# FetchContent_Declare(
-#     raylib
-#     GIT_REPOSITORY git@github.com:raysan5/raylib.git
-#     GIT_TAG 5.5
-#     GIT_SHALLOW TRUE
-#     SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/raylib
-# )
-# FetchContent_MakeAvailable(raylib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/cglm)
-
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/googletest)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/benchmark)
 
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(DEMO_DIR "${CMAKE_SOURCE_DIR}/demo")
+set(TEST_DIR "${CMAKE_SOURCE_DIR}/test")
 set(INC_DIRS 
     "${SRC_DIR}"
     "${SRC_DIR}/aabbtree"
@@ -50,6 +35,8 @@ set(INC_DIRS
     "${SRC_DIR}/pool"
     "${CMAKE_SOURCE_DIR}/vendor/raylib/src"
     "${CMAKE_SOURCE_DIR}/vendor/cglm/include"
+    "${CMAKE_SOURCE_DIR}/vendor/googletest/googletest/include"
+    "${CMAKE_SOURCE_DIR}/vendor/benchmark/include"
 )
 
 macro(create_lib target libs)
@@ -66,7 +53,6 @@ macro(create_demo target libs)
     target_link_libraries(${target_demo} PRIVATE ${libs})
     target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
 endmacro()
-
 macro(create_demo_nolink target)
     set(target_demo "${target}_demo")
     add_executable(${target_demo} "${DEMO_DIR}/${target}/main.cpp")
@@ -74,5 +60,26 @@ macro(create_demo_nolink target)
     target_compile_options(${target_demo} PRIVATE -Wall -Wextra)
 endmacro()
 
+macro(create_test target libs)
+    set(target_test "${target}_test")
+    add_executable(${target_test} "${TEST_DIR}/${target}/main.cpp")
+    target_include_directories(${target_test} PRIVATE ${INC_DIRS})
+    target_link_libraries(${target_test} PRIVATE ${target})
+    target_link_libraries(${target_test} PRIVATE gtest)
+    target_compile_options(${target_test} PRIVATE -Wall -Wextra)
+endmacro()
+macro(create_test_nolink target)
+    set(target_test "${target}_test")
+    add_executable(${target_test} "${TEST_DIR}/${target}/main.cpp")
+    target_include_directories(${target_test} PRIVATE ${INC_DIRS})
+    target_link_libraries(${target_test} PRIVATE gtest)
+    target_compile_options(${target_test} PRIVATE -Wall -Wextra)
+endmacro()
+
+enable_testing()
+
 create_lib(aabbtree "")
+
 create_demo(aabbtree raylib)
+
+create_test_nolink(arrlist)

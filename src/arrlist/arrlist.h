@@ -17,7 +17,7 @@
         if (new_buffer == nullptr) {                                                                                                   \
             break;                                                                                                                     \
         }                                                                                                                              \
-        (arrlist)->buffer = new_buffer;                                                                                                \
+        (arrlist)->buffer = (__typeof__((arrlist)->buffer))new_buffer;                                                                 \
     } while (0);
 
 #define _ARRLIST_HANDLE_CAPACITY_EXTEND(arrlist, size_increase)                                                                        \
@@ -50,8 +50,8 @@
                                                                                                                                        \
         _ARRLIST_HANDLE_CAPACITY_EXTEND((arrlist), 1);                                                                                 \
                                                                                                                                        \
-        for (size_t i = (arrlist)->count - 1; i >= index; i--) {                                                                       \
-            (arrlist)->buffer[i + 1] = (arrlist)->buffer[i];                                                                           \
+        for (size_t i = (arrlist)->count; i > index; i--) {                                                                            \
+            (arrlist)->buffer[i] = (arrlist)->buffer[i - 1];                                                                           \
         }                                                                                                                              \
         (arrlist)->buffer[index] = value;                                                                                              \
         (arrlist)->count++;                                                                                                            \
@@ -83,7 +83,8 @@
         }                                                                                                                              \
                                                                                                                                        \
         (arrlist)->capacity = (arrlist)->count;                                                                                        \
-        (arrlist)->buffer = realloc((arrlist)->buffer, (arrlist)->capacity * sizeof(*(arrlist)->buffer));                              \
+        (arrlist)->buffer =                                                                                                            \
+            (__typeof__((arrlist)->buffer))realloc((arrlist)->buffer, (arrlist)->capacity * sizeof(*(arrlist)->buffer));               \
     } while (0);
 
 #define ARRLIST_FREE(arrlist)                                                                                                          \
