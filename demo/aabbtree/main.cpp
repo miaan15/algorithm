@@ -15,15 +15,15 @@ extern "C" {
 constexpr u32 window_width = 1600;
 constexpr u32 window_height = 900;
 
-constexpr size_t box_cnt = 6700;
+constexpr size_t box_cnt = 67;
 constexpr f32 box_min_sz = 10;
 constexpr f32 box_max_sz = 30;
 constexpr f32 box_min_speed = 80;
 constexpr f32 box_max_speed = 100;
 
-constexpr size_t inert_box_cnt = 6700;
+constexpr size_t inert_box_cnt = 670;
 constexpr f32 inert_box_min_sz = 5;
-constexpr f32 inert_box_max_sz = 10;
+constexpr f32 inert_box_max_sz = 20;
 constexpr f32 inert_box_offset_x = 100;
 constexpr f32 inert_box_offset_y = 50;
 constexpr f32 inert_box_min_speed = 10;
@@ -138,13 +138,13 @@ int main() {
         ClearBackground(RAYWHITE);
 
         // Draw inert bounds
-        // std::vector<_AABBTree_Node *> bounds_list;
-        // get_box_bounds_helper(bounds_list, tree.root);
-        // for (auto *node : bounds_list) {
-        //     auto b = node->bounds;
-        //     auto color = node->type ? inert_bounds_color : bounds_color;
-        //     DrawRectangleLines(b[0][0], b[0][1], b[1][0] - b[0][0], b[1][1] - b[0][1], color);
-        // }
+        std::vector<_AABBTree_Node *> bounds_list;
+        get_box_bounds_helper(bounds_list, tree.root);
+        for (auto *node : bounds_list) {
+            auto b = node->bounds;
+            auto color = node->type ? inert_bounds_color : bounds_color;
+            DrawRectangleLines(b[0][0], b[0][1], b[1][0] - b[0][0], b[1][1] - b[0][1], color);
+        }
 
         // Draw boxes
         for (auto &p : inert_box_data_list) {
