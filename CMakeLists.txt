@@ -83,3 +83,4 @@ create_lib(aabbtree "")
 create_demo(aabbtree raylib)
 
 create_test_nolink(arrlist)
+create_test_nolink(list)

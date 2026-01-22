@@ -4,7 +4,6 @@ extern "C" {
 #include <arrlist.h>
 }
 
-// Define test types
 DEFINE_ARRLIST(int)
 DEFINE_ARRLIST(float)
 DEFINE_ARRLIST(char)

@@ -19,8 +19,8 @@
 
 #define LIST_INSERT(list, value)                                                                                                       \
     ({                                                                                                                                 \
-        typeof((list)->head) __node = malloc(sizeof(*(list)->head));                                                                   \
-        typeof(&(list)->head->data) __result = NULL;                                                                                   \
+        __typeof__((list)->head) __node = (__typeof__((list)->head))malloc(sizeof(*(list)->head));                                     \
+        __typeof__(&(list)->head->data) __result = NULL;                                                                               \
                                                                                                                                        \
         if (__node != NULL) {                                                                                                          \
             __node->data = (value);                                                                                                    \
@@ -37,7 +37,7 @@
     do {                                                                                                                               \
         if ((list)->head == NULL) break;                                                                                               \
                                                                                                                                        \
-        typeof((list)->head) __old_head = (list)->head;                                                                                \
+        __typeof__((list)->head) __old_head = (list)->head;                                                                            \
         (list)->head = (list)->head->next;                                                                                             \
         (list)->count--;                                                                                                               \
         free(__old_head);                                                                                                              \
@@ -45,8 +45,8 @@
 
 #define LIST_REMOVE(list, value_ptr)                                                                                                   \
     do {                                                                                                                               \
-        typeof((list)->head) __cur_node = (list)->head;                                                                                \
-        typeof((list)->head) __pre_node = NULL;                                                                                        \
+        __typeof__((list)->head) __cur_node = (list)->head;                                                                            \
+        __typeof__((list)->head) __pre_node = NULL;                                                                                    \
                                                                                                                                        \
         while (__cur_node != NULL) {                                                                                                   \
             if (&__cur_node->data == (value_ptr)) {                                                                                    \
@@ -68,10 +68,10 @@
 
 #define LIST_GET(list, index)                                                                                                          \
     ({                                                                                                                                 \
-        typeof(&(list)->head->data) __result = NULL;                                                                                   \
+        __typeof__(&(list)->head->data) __result = NULL;                                                                               \
                                                                                                                                        \
         if ((index) < (list)->count) {                                                                                                 \
-            typeof((list)->head) __cur_node = (list)->head;                                                                            \
+            __typeof__((list)->head) __cur_node = (list)->head;                                                                        \
             for (size_t __i = 0; __i < (index); __i++) {                                                                               \
                 __cur_node = __cur_node->next;                                                                                         \
             }                                                                                                                          \
@@ -83,9 +83,9 @@
 
 #define LIST_FREE(list)                                                                                                                \
     do {                                                                                                                               \
-        typeof((list)->head) __cur_node = (list)->head;                                                                                \
+        __typeof__((list)->head) __cur_node = (list)->head;                                                                            \
         while (__cur_node != NULL) {                                                                                                   \
-            typeof((list)->head) __next = __cur_node->next;                                                                            \
+            __typeof__((list)->head) __next = __cur_node->next;                                                                        \
             free(__cur_node);                                                                                                          \
             __cur_node = __next;                                                                                                       \
         }                                                                                                                              \
