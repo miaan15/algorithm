@@ -47,10 +47,10 @@
 #define POOL_RESERVE(pool, new_capacity)                                                                                               \
     do {                                                                                                                               \
         size_t __old_capacity = (pool)->capacity;                                                                                      \
-        typeof((pool)->buffer) __old_buffer = (pool)->buffer;                                                                          \
+        __typeof__((pool)->buffer) __old_buffer = (pool)->buffer; \
                                                                                                                                        \
         (pool)->capacity = (new_capacity);                                                                                             \
-        (pool)->buffer = (typeof((pool)->buffer))malloc((pool)->capacity * sizeof(*(pool)->buffer));                                   \
+        (pool)->buffer = (__typeof__((pool)->buffer))malloc((pool)->capacity * sizeof(*(pool)->buffer));                               \
                                                                                                                                        \
         if (__old_buffer != nullptr) {                                                                                                 \
             memcpy((pool)->buffer, __old_buffer, __old_capacity * sizeof(*(pool)->buffer));                                            \
@@ -112,7 +112,7 @@
         }                                                                                                                              \
                                                                                                                                        \
         (pool)->capacity = (pool)->max_count;                                                                                          \
-        (pool)->buffer = (typeof((pool)->buffer))realloc((pool)->buffer, (pool)->capacity * sizeof(*(pool)->buffer));                  \
+        (pool)->buffer = (__typeof__((pool)->buffer))realloc((pool)->buffer, (pool)->capacity * sizeof(*(pool)->buffer)); \
     } while (0)
 
 #define POOL_FREE(pool)                                                                                                                \

@@ -84,3 +84,4 @@ create_demo(aabbtree raylib)
 
 create_test_nolink(arrlist)
 create_test_nolink(slist)
+create_test_nolink(pool)
