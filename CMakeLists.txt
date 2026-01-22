@@ -31,7 +31,7 @@ set(INC_DIRS
     "${SRC_DIR}/aabbtree"
     "${SRC_DIR}/arena"
     "${SRC_DIR}/arrlist"
-    "${SRC_DIR}/list"
+    "${SRC_DIR}/slist"
     "${SRC_DIR}/pool"
     "${CMAKE_SOURCE_DIR}/vendor/raylib/src"
     "${CMAKE_SOURCE_DIR}/vendor/cglm/include"
@@ -83,4 +83,4 @@ create_lib(aabbtree "")
 create_demo(aabbtree raylib)
 
 create_test_nolink(arrlist)
-create_test_nolink(list)
+create_test_nolink(slist)
